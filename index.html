@@ -7,14 +7,124 @@
     <title>Spotify - Web player: music for everyone</title>
     <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon">
     <!-- ============================================= GOOGLE FONTS ============================================= -->
-    <!-- ============================================= CSS EXTERN============================================= -->
+    <!-- ============================================= EXTERNAL CSS ============================================= -->
     <link rel="stylesheet" href="styles/style.css">
     <!-- ============================================= UNICONS LIBRARY ============================================= -->
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <!-- ============================================= FONTAWESOME LIBRARY ============================================= -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
 
+    <section class="sidebar">
+
+        <div class="principal-btns">
+            <a href="#">
+                <svg role="img" height="24" width="24" aria-hidden="true" class="Svg-sc-ytk21e-0 haNxPq home-icon"
+                    viewBox="0 0 24 24" data-encore-id="icon">
+                    <path
+                        d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33a2 2 0 0 1 1 1.732V21a1 1 0 0 1-1 1h-6.5a1 1 0 0 1-1-1v-6h-3v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.577a2 2 0 0 1 1-1.732l7.5-4.33z">
+                    </path>
+                </svg>
+                Home</a>
+            <a href="#">
+                <svg role="img" height="24" width="24" aria-hidden="true" class="Svg-sc-ytk21e-0 haNxPq search-icon"
+                    viewBox="0 0 24 24" data-encore-id="icon">
+                    <path
+                        d="M10.533 1.279c-5.18 0-9.407 4.14-9.407 9.279s4.226 9.279 9.407 9.279c2.234 0 4.29-.77 5.907-2.058l4.353 4.353a1 1 0 1 0 1.414-1.414l-4.344-4.344a9.157 9.157 0 0 0 2.077-5.816c0-5.14-4.226-9.28-9.407-9.28zm-7.407 9.279c0-4.006 3.302-7.28 7.407-7.28s7.407 3.274 7.407 7.28-3.302 7.279-7.407 7.279-7.407-3.273-7.407-7.28z">
+                    </path>
+                </svg>
+                Search</a>
+        </div>
+
+        <div class="my-lib">
+            <div class="my-lib-header">
+                <div class="my-lib-h3">
+                    <svg role="img" height="24" width="24" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon"
+                        class="Svg-sc-ytk21e-0 haNxPq">
+                        <path
+                            d="M3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zM15.5 2.134A1 1 0 0 0 14 3v18a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6.464a1 1 0 0 0-.5-.866l-6-3.464zM9 2a1 1 0 0 0-1 1v18a1 1 0 1 0 2 0V3a1 1 0 0 0-1-1z">
+                        </path>
+                    </svg>
+                    <h3>Your Library</h3>
+                </div>
+                <div class="my-lib-btns">
+                    <a href="#">
+                        <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16"
+                            data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq">
+                            <path
+                                d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z">
+                            </path>
+                        </svg>
+                    </a>
+                    <a href="#">
+                        <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16"
+                            data-encore-id="icon" class="Svg-sc-ytk21e-0 leya-dW">
+                            <path
+                                d="M7.19 1A.749.749 0 0 1 8.47.47L16 7.99l-7.53 7.521a.75.75 0 0 1-1.234-.815.75.75 0 0 1 .174-.243l5.72-5.714H.75a.75.75 0 1 1 0-1.498h12.38L7.41 1.529a.749.749 0 0 1-.22-.53z">
+                            </path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="my-lib-tags">
+                <h6>Playlists</h6>
+                <h6>Artists</h6>
+                <h6>Podcasts and Programs</h6>
+            </div>
+
+            <div class="my-lib-filter">
+                <a href="#">
+                    <svg role="img" height="16" width="16" aria-hidden="true"
+                        class="Svg-sc-ytk21e-0 haNxPq CIVozJ8XNPJ60uMN23Yg" viewBox="0 0 16 16" data-encore-id="icon">
+                        <path
+                            d="M7 1.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5zM.25 7a6.75 6.75 0 1 1 12.096 4.12l3.184 3.185a.75.75 0 1 1-1.06 1.06L11.304 12.2A6.75 6.75 0 0 1 .25 7z">
+                        </path>
+                    </svg>
+                </a>
+                <a href="#">
+                    Recentes
+                    <svg role="img" height="16" width="16" aria-hidden="true"
+                        class="Svg-sc-ytk21e-0 haNxPq SbDHY3fVADNJ4l9qOLQ2" viewBox="0 0 16 16" data-encore-id="icon">
+                        <path d="m14 6-6 6-6-6h12z"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="my-lib-playlists">
+            <div class="playlist-1">
+                <img src="img/liked-songs.png" alt="">
+                <div class="playlist-info">
+                    <h3>Liked Songs</h3>
+                    <p>
+                        <svg role="img" height="16" width="16" aria-hidden="false"
+                            class="Svg-sc-ytk21e-0 ilPTuf G7aCptcOZswI1fN6dGkO" viewBox="0 0 16 16"
+                            data-encore-id="icon">
+                            <title>Pinned</title>
+                            <path
+                                d="M8.822.797a2.72 2.72 0 0 1 3.847 0l2.534 2.533a2.72 2.72 0 0 1 0 3.848l-3.678 3.678-1.337 4.988-4.486-4.486L1.28 15.78a.75.75 0 0 1-1.06-1.06l4.422-4.422L.156 5.812l4.987-1.337L8.822.797z">
+                            </path>
+                        </svg>
+                        Playlist • 0 songs
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <main>
+
+
+
+    </main>
+
+
+    <!-- ============================================= EXTERNAL JS ============================================= -->
+    <script src="js/main.js"></script>
 </body>
 
 </html>
