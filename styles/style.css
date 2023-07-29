@@ -1,6 +1,42 @@
+/* ================================ FONTS ================================ */
+@font-face {
+    font-family: spotify-font;
+    src: url(../fonts/Spotify-Font/GothamMedium.ttf);
+}
+
 /* ================================ CSS VARIABLES ================================ */
 
-:root {}
+:root {
+    /* ===== COLORS ===== */
+    --bg-color: #000;
+    --background-base: #121212;
+    --background-noise: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=);
+    --text-color: #FFF;
+    --text-black: #000;
+    --grey-color: #b3b3b3;
+
+    /* ===== FONTS ===== */
+    --body-font: spotify-font;
+
+    /* .5rem = 8px, 1rem = 16px, 1.5rem = 24px, ...*/
+    --h1-font-size: 2.5rem;
+    --h2-font-size: 1.5rem;
+    --h3-font-size: 1.2rem;
+    --normal-font-size: 1rem;
+    --small-font-size: 0.9rem;
+    --smaller-font-size: 0.8rem;
+
+    /* ======== FONT WEIGHT ========= */
+    --font-medium: 500;
+    --font-semi-bold: 600;
+    --font-bold: 700;
+
+    /* ======== Transition ========= */
+    --transition: all .3s ease;
+
+    /* ===== Sidebar Widths ===== */
+    --left-sidebar: 420px;
+}
 
 
 
@@ -9,4 +45,133 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: var(--body-font);
+    font-weight: var(--font-medium);
+    letter-spacing: -1px;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+svg {
+    fill: currentColor;
+}
+
+/* ============== LAYOUT ================  */
+
+main {
+    padding: 8px;
+    display: grid;
+    grid-template-columns: var(--left-sidebar) 1fr;
+}
+
+aside {
+    background-color: var(--bg-color);
+    margin-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.main-section {
+    background-color: var(--background-base);
+    border-radius: 8px;
+    position: relative;
+    z-index: 0;
+}
+
+/* ============== LEFT SIDEBAR ================  */
+
+.principal-btns {
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-base);
+    border-radius: 8px;
+}
+
+.principal-btn {
+    padding: 4px 12px;
+}
+
+.principal-btn a {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    color: var(--grey-color);
+    height: 40px;
+    font-weight: var(--font-bold);
+    font-size: 1rem;
+}
+
+.principal-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.my-lib {
+    background-color: var(--background-base);
+    border-radius: 8px;
+}
+
+.my-lib-header {
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+}
+
+.my-lib-header .my-lib-btn-left {
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    color: var(--grey-color);
+    margin-inline-end: auto;
+    height: 40px;
+}
+
+.my-lib-header .my-lib-btn-right {
+    color: var(--grey-color);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============== RIGHT SIDEBAR ================  */
+.gradient {
+    background-color: rgb(83, 83, 83);
+    background-image: linear-gradient(rgba(0, 0, 0, .6) 0, var(--background-base) 100%),
+        var(--background-noise);
+    height: 332px;
+    z-index: 1;
+    width: 100%;
+    position: absolute;
+    transition: background 1s ease;
+    border-radius: 8px;
+}
+
+.main {
+    z-index: 5;
+    position: relative;
+    padding: 0 24px;
+}
+
+footer {
+    padding: 0 32px;
 }
