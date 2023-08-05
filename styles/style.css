@@ -39,7 +39,7 @@
     --transition: all .3s ease;
 
     /* ===== Sidebar Widths ===== */
-    --left-sidebar: 420px;
+    --left-sidebar: 22vw;
 }
 
 /* ============== ELEMENTS STYLES ================  */
@@ -539,6 +539,7 @@ aside {
 }
 
 .main-title h6:hover {
+    cursor: pointer;
     text-decoration: underline 1px solid var(--grey-color);
 }
 
@@ -863,7 +864,7 @@ footer {
     transform: scale(1.06);
 }
 
-.resume {
+.pause {
     display: none;
 }
 
@@ -998,3 +999,9 @@ footer {
 }
 
 /* ============================= MEDIA QUERIES ===============================  */
+@media only screen and (max-width: 1440px) {
+
+    main {
+        grid-template-columns: 30vw 1fr;
+    }
+}

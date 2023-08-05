@@ -18,11 +18,34 @@ dropdowns.forEach(dropdown => {
     const selected = dropdown.querySelector('.selected span');
     const select = dropdown.querySelector('.select');
 
+
+    let isOpen = false;
+
+    document.querySelector('main').onclick = () => {
+        console.log('A');
+        dropdowns.forEach(dropdown => {
+            menu.style.display = "none";
+            dropdownHideIcon.style.display = "none"
+            dropdownShowIcon.style.display = "inline-block";
+            isOpen = false;
+        })
+    }
     //create the click event
     select.addEventListener('click', () => {
-        menu.style.display = "block";
-        dropdownHideIcon.style.display = "inline-block"
-        dropdownShowIcon.style.display = "none";
+        if (isOpen == false) {
+            setTimeout(() => {
+
+                menu.style.display = "block";
+                dropdownHideIcon.style.display = "inline-block"
+                dropdownShowIcon.style.display = "none";
+                isOpen = true;
+            }, 50);
+        } else {
+            menu.style.display = "none";
+            dropdownHideIcon.style.display = "none"
+            dropdownShowIcon.style.display = "inline-block";
+            isOpen = false;
+        }
     })
 
 
@@ -34,8 +57,12 @@ dropdowns.forEach(dropdown => {
         dropdownHideIcon.style.display = "none"
         dropdownShowIcon.style.display = "inline-block";
         selected.innerHTML = option.querySelector("span").innerHTML;
+        isOpen = false;
     }))
 })
+
+
+
 
 //main element
 const mainElement = document.querySelector('.main');
