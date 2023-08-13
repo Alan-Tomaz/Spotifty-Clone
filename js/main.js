@@ -22,7 +22,6 @@ dropdowns.forEach(dropdown => {
     let isOpen = false;
 
     document.querySelector('main').onclick = () => {
-        console.log('A');
         dropdowns.forEach(dropdown => {
             menu.style.display = "none";
             dropdownHideIcon.style.display = "none"
@@ -34,7 +33,6 @@ dropdowns.forEach(dropdown => {
     select.addEventListener('click', () => {
         if (isOpen == false) {
             setTimeout(() => {
-
                 menu.style.display = "block";
                 dropdownHideIcon.style.display = "inline-block"
                 dropdownShowIcon.style.display = "none";
