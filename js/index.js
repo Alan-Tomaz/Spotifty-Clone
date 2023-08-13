@@ -23,7 +23,7 @@ const FormValidator = (function () {
             } else {
                 localStorage['client-id'] = document.querySelector(FormFields.clientId).value;
                 localStorage['client-secret'] = document.querySelector(FormFields.clientSecret).value;
-                window.location.href = "../pages/app.html";
+                window.location.href = "pages/app.html";
             }
 
         })
