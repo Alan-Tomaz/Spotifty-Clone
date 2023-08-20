@@ -21,7 +21,7 @@ const APIController = (function () {
             localStorage['code'] = code;
             return code;
         } else {
-            window.location.href = "http://127.0.0.1:5500"
+            window.location.href = localStorage['root-url'];
         }
     }
 
@@ -47,7 +47,7 @@ const APIController = (function () {
             const data = await result.json();
             console.log(data);
             if (data.error != undefined) {
-                window.location.href = "http://127.0.0.1:5500"
+                window.location.href = localStorage['root-url']
             } else {
                 localStorage['refresh-token'] = data.refresh_token != undefined ? data.refreshToken : localStorage['refresh-token'];
                 return data.access_token;
@@ -96,9 +96,8 @@ const APIController = (function () {
     }
 
 
-    const _getCurrentUserPlaylists = async (token) => {
+    const _getCurrentUserPlaylists = async (token, limit) => {
 
-        const limit = 10;
         const offset = 0;
 
         const result = await fetch(`https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`, {
@@ -113,6 +112,89 @@ const APIController = (function () {
 
     }
 
+    const _getCurrentSavedArtists = async (token, limit) => {
+
+
+        const result = await fetch(`https://api.spotify.com/v1/me/following?type=artist&limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        const data = await result.json();
+        return data;
+
+    }
+
+    const _getCurrentSavedAlbums = async (token, limit) => {
+
+        const offset = 0;
+
+        const result = await fetch(`https://api.spotify.com/v1/me/albums?limit=${limit}&offset=${offset}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+
+    }
+
+    const _getCurrentSavedEpisodes = async (token, limit) => {
+
+        const offset = 0;
+
+        const result = await fetch(`https://api.spotify.com/v1/me/episodes?limit=${limit}&offset=${offset}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+
+    }
+
+    const _getCurrentSavedTracks = async (token, limit) => {
+
+        const offset = 0;
+
+        const result = await fetch(`https://api.spotify.com/v1/me/tracks?limit=${limit}&offset=${offset}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentPlayingTrack = async (token) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/me/player/currently-playing`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        if (result.status == 204) {
+            return false
+        } else {
+            const data = await result.json();
+            return data;
+        }
+
+    }
+
     return {
         checkCode() {
             return _checkCode();
@@ -123,14 +205,77 @@ const APIController = (function () {
         getUserProfile(token) {
             return _getUserProfile(token);
         },
-        getCurrentUserPlaylists(token) {
-            return _getCurrentUserPlaylists(token);
+        getCurrentUserPlaylists(token, limit) {
+            return _getCurrentUserPlaylists(token, limit);
+        },
+        getCurrentSavedArtists(token, limit) {
+            return _getCurrentSavedArtists(token, limit);
+        },
+        getCurrentSavedAlbums(token, limit) {
+            return _getCurrentSavedAlbums(token, limit);
+        },
+        getCurrentSavedEpisodes(token, limit) {
+            return _getCurrentSavedEpisodes(token, limit);
+        },
+        getCurrentSavedTracks(token, limit) {
+            return _getCurrentSavedTracks(token, limit);
+        },
+        getCurrentPlayingTrack(token) {
+            return _getCurrentPlayingTrack(token);
         }
     }
 })();
 
 //UI Controller Module
 const UIController = (function () {
+
+    const DOMElements = {
+        playlistsDiv: '.playlists',
+        mainEpisodes: '.main-episodes',
+        mainFavorits: '.main-favorits',
+        favoritArtists: '.favorit-artists',
+        favoritAlbums: '.favorit-albums',
+        favoritPlaylists: '.favorit-playlists'
+    }
+
+    function _formatTime(time) {
+        let month;
+        switch (time[1]) {
+            case '01':
+                month = 'Jan';
+            case '02':
+                month = 'Feb';
+            case '03':
+                month = 'Mar';
+            case '04':
+                month = 'Apr';
+            case '05':
+                month = 'May';
+            case '06':
+                month = 'Jun';
+            case '07':
+                month = 'Jul';
+            case '08':
+                month = 'Aug';
+            case '09':
+                month = 'Sep';
+            case '10':
+                month = 'Oct';
+            case '11':
+                month = 'Nov';
+            case '12':
+                month = 'Dec';
+        }
+        return month + " " + time[0];
+    }
+
+    function _formatName(newName) {
+        if (newName.length >= 20) {
+            return newName.slice(0, 20) + '...';
+        } else {
+            return newName;
+        }
+    }
 
     return {
 
@@ -196,6 +341,183 @@ const UIController = (function () {
                 }))
             })
         },
+
+        createPlaylist(id, name, imgUrl, userName) {
+            const html = `
+            <li class="playlist-item" id="${id}">
+                <div class="playlist">
+                    <div class="playlist-img">
+                        <img src="${imgUrl}" alt="playlist-img">
+                    </div>
+                    <div class="playlist-info">
+                        <h3 id="playlist-name">${_formatName(name)}</h3>
+                        <p id="left-card-type">
+                            Playlist • ${userName} 
+                        </p>
+                    </div>
+                </div>
+            </li>
+            `
+            document.querySelector(DOMElements.playlistsDiv).insertAdjacentHTML('beforeend', html);
+        },
+
+        createAlbum(id, name, imgUrl, artist) {
+            const html = `
+            <li class="playlist-item album-item" id="${id}">
+                <div class="playlist">
+                    <div class="playlist-img">
+                        <img src="${imgUrl}" alt="playlist-img">
+                    </div>
+                    <div class="playlist-info">
+                        <h3 id="playlist-name">${_formatName(name)}</h3>
+                        <p id="left-card-type">
+                            Album • ${artist} 
+                        </p>
+                    </div>
+                </div>
+            </li>
+            `
+            document.querySelector(DOMElements.playlistsDiv).insertAdjacentHTML('beforeend', html);
+        },
+
+        createSavedArtist(id, name, imgUrl) {
+            const html = `
+            <li class="playlist-item artist-item" id="${id}">
+                <div class="playlist artist">
+                    <div class="playlist-img artist-img">
+                    <img src="${imgUrl}" alt="artist-img">
+                </div>
+                <div class="playlist-info">
+                    <h3 id="artist-name">${_formatName(name)}</h3>
+                    <p id="left-card-type">
+                        Artist
+                    </p>
+                </div>
+                </div>
+            </li>`
+            document.querySelector(DOMElements.playlistsDiv).insertAdjacentHTML('beforeend', html);
+        },
+
+        createEpisodeCard(id, name, imgUrl, addDate) {
+            const date = addDate.split('-');
+            const html = `
+            <div class="card card-1 episode-card" id="${id}">
+                <div class="card-img">
+                    <img src="${imgUrl}" alt="">
+                        <button class="play-media">
+                                <svg role="img" height="24" width="24" aria-hidden="true"
+                                viewBox="0 0 24 24" data-encore-id="icon"
+                                class="Svg-sc-ytk21e-0 haNxPq">
+                                    <path
+                                        d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                                    </path>
+                                </svg>
+                            </button>
+                </div>
+                <div class="card-info">
+                <h3 class="card-title">${_formatName(name)}</h3>
+                    <h4 class="card-artist">${_formatTime(date)}</h4>
+                </div>
+            </div>
+            `
+            document.querySelector(DOMElements.mainEpisodes).insertAdjacentHTML('beforeend', html);
+        },
+
+        createTrackCard(id, name, imgUrl, artist) {
+            const html = `
+            <div class="card card-1 track-card" id="${id}">
+                <div class="card-img">
+                    <img src="${imgUrl}" alt="">
+                    <button class="play-media">
+                        <svg role="img" height="24" width="24" aria-hidden="true"
+                        viewBox="0 0 24 24" data-encore-id="icon"
+                        class="Svg-sc-ytk21e-0 haNxPq">
+                            <path
+                            d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-info">
+                <h3 class="card-title">${_formatName(name)}</h3>
+                <h4 class="card-artist">${artist}</h4>
+                </div>
+            </div>
+            `
+            document.querySelector(DOMElements.mainFavorits).insertAdjacentHTML('beforeend', html);
+        },
+
+        createArtistCard(id, artistName, imgUrl) {
+            const html = `
+            <div class="card card-1 artist-card" id="${id}">
+                <div class="card-img">
+                    <img src="${imgUrl}" alt="">
+                    <button class="play-media">
+                        <svg role="img" height="24" width="24" aria-hidden="true"
+                        viewBox="0 0 24 24" data-encore-id="icon"
+                        class="Svg-sc-ytk21e-0 haNxPq">
+                        <path
+                            d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                        </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-info">
+                    <h3 class="card-title">${_formatName(artistName)}</h3>
+                    <h4 class="card-artist">Artist</h4>
+                </div>
+            </div>
+            `
+            document.querySelector(DOMElements.favoritArtists).insertAdjacentHTML('beforeend', html);
+        },
+
+        createAlbumCard(id, name, imgUrl, artist) {
+            const html = `
+            <div class="card card-1 album-card" id="${id}">
+                <div class="card-img">
+                    <img src="${imgUrl}" alt="">
+                    <button class="play-media">
+                        <svg role="img" height="24" width="24" aria-hidden="true"
+                        viewBox="0 0 24 24" data-encore-id="icon"
+                        class="Svg-sc-ytk21e-0 haNxPq">
+                        <path
+                            d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                        </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-info">
+                        <h3 class="card-title">${_formatName(name)}</h3>
+                        <h4 class="card-artist"> Album • ${artist}</h4>
+                </div>
+            </div>
+            `
+            document.querySelector(DOMElements.favoritAlbums).insertAdjacentHTML('beforeend', html);
+        },
+
+        createPlaylistCard(id, name, imgUrl, ownerName) {
+            const html = `
+            <div class="card card-1 playlist-cards" id="${id}">
+                <div class="card-img">
+                    <img src="${imgUrl}" alt="">
+                    <button class="play-media">
+                        <svg role="img" height="24" width="24" aria-hidden="true"
+                        viewBox="0 0 24 24" data-encore-id="icon"
+                        class="Svg-sc-ytk21e-0 haNxPq">
+                        <path
+                            d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                        </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-info">
+                    <h3 class="card-title">${_formatName(name)}</h3>
+                    <h4 class="card-artist">Playlist • ${ownerName}</h4>
+                </div>
+            </div>
+            `
+            document.querySelector(DOMElements.favoritPlaylists).insertAdjacentHTML('beforeend', html);
+        }
     }
 })()
 
@@ -232,7 +554,28 @@ const APPController = (function (APICtrl, UICtrl) {
         userImg: '#profile-img',
         forMe: '#for-me',
         playlistUserImg: '#playlist-user-img',
-        playlistUserName: '#playlist-user-name'
+        playlistUserName: '#playlist-user-name',
+        //lateral bar items
+        playlistItems: '.playlist-item',
+        artistItems: '.artist-item',
+        albumItems: '.album-item',
+        //main content items
+        episodeCards: '.episode-card',
+        trackCards: '.track-card',
+        artistCards: '.artist-card',
+        albumCards: '.album-card',
+        playlistCards: '.playlist-cards',
+        favoritSongs: '#favorit-songs',
+        //player elements
+        musicPanel: '.music-panel',
+        playerMusicImg: '#player-music-img',
+        musicName: '.music-name',
+        musicAuthor: '.music-author',
+        actualTimeBar: '.actual-time-bar',
+        actualVolume: '.actualVolume',
+        pause: '.pause',
+        resume: '.resume',
+        musicBtn: '.music-btn'
     }
 
     /* Default Window with the Playlists and Artists */
@@ -247,6 +590,7 @@ const APPController = (function (APICtrl, UICtrl) {
             document.querySelector(DOMElements.playlistBand).style.display = 'none';
             document.querySelector(DOMElements.playlistPlay).style.display = 'none';
             document.querySelector(DOMElements.playlistTracks).style.display = 'none';
+            document.querySelector(DOMElements.playTrack).style.opacity = '0';
         }
 
         function nextWindow() {
@@ -339,6 +683,7 @@ const APPController = (function (APICtrl, UICtrl) {
     }
 
     function alternativeWindow() {
+
         //Show the Default Window
         function hideWindow() {
             document.querySelector(DOMElements.mixSection).style.display = 'none';
@@ -418,36 +763,174 @@ const APPController = (function (APICtrl, UICtrl) {
     // Store Token
     const storeToken = async () => {
         localStorage['token'] = await APICtrl.getToken(await APICtrl.checkCode());
+
+        if (localStorage['token'] != undefined) {
+            changeContentWithAPI().then(clarifyApp);
+        }
     }
 
     //Change content with the data of the API
     const changeContentWithAPI = async () => {
 
+        /* ================= LATERAL SIDEBAR ====================== */
+        function _lateralSidebar() {
+            //Get Profile Info
+            async function _changeUserInfo() {
+                //get token
+                const token = localStorage['token'];
+                //get user info
+                const userProfileData = await APICtrl.getUserProfile(token);
+                //change UI user info
+                document.querySelector(DOMElements.userImg).src = userProfileData.images[0].url;
+            }
 
-        //Get Profile Info
-        async function _changeUserInfo() {
-            //get token
-            const token = localStorage['token'];
-            //get user info
-            const userProfileData = await APICtrl.getUserProfile(token);
-            //change UI user info
-            document.querySelector(DOMElements.userImg).src = userProfileData.images[0].url;
-            document.querySelector(DOMElements.playlistUserImg).src = userProfileData.images[0].url;
-            document.querySelector(DOMElements.playlistUserName).innerHTML = userProfileData.display_name;
-            document.querySelector(DOMElements.forMe).innerHTML = `Made For ${userProfileData.display_name}`;
+            async function _getUserPlaylists() {
+                //get token
+                const token = localStorage['token'];
+                //get user playlists
+                const userPlaylists = await APICtrl.getCurrentUserPlaylists(token, 10);
+
+                userPlaylists.items.forEach(element => {
+                    UICtrl.createPlaylist(element.id, element.name, element.images[0].url, element.owner.display_name);
+                });
+                document.querySelectorAll(DOMElements.playlistItems).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            async function _getUserAlbums() {
+                //get token
+                const token = localStorage['token'];
+                //get user playlists
+                const userAlbums = await APICtrl.getCurrentSavedAlbums(token, 10);
+                userAlbums.items.forEach(element => {
+                    UICtrl.createAlbum(element.album.id, element.album.name, element.album.images[0].url, element.album.artists[0].name);
+                });
+                document.querySelectorAll(DOMElements.albumItems).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            async function _getSavedArtists() {
+                //get token
+                const token = localStorage['token'];
+                //get user playlists
+                const userArtists = await APICtrl.getCurrentSavedArtists(token, 10);
+
+                userArtists.artists.items.forEach(element => {
+                    UICtrl.createSavedArtist(element.id, element.name, element.images[0].url);
+                });
+                document.querySelectorAll(DOMElements.artistItems).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            async function getCurrentPlayingTrack() {
+                const token = localStorage['token'];
+                //get user playlists
+                const currentPlayingTrack = await APICtrl.getCurrentPlayingTrack(token);
+            }
+
+            getCurrentPlayingTrack()
+            _getUserAlbums();
+            _getSavedArtists();
+            _changeUserInfo();
+            _getUserPlaylists();
         }
 
-        async function _getUserPlaylists() {
-            //get token
-            const token = localStorage['token'];
-            //get user playlists
-            const userPlaylists = await APICtrl.getCurrentUserPlaylists(token);
-            console.log(userPlaylists);
+        function _mainContent() {
+            async function _getEpisodes() {
+                //get token
+                const token = localStorage['token'];
+                //get episodes
+                const userSavedEpisodes = await APICtrl.getCurrentSavedEpisodes(token, 5);
+                userSavedEpisodes.items.forEach(element => {
+                    UICtrl.createEpisodeCard(element.episode.id, element.episode.name, element.episode.images[0].url, element.episode.release_date);
+                });
+                document.querySelectorAll(DOMElements.episodeCards).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            async function _getSavedTracks() {
+                //get token
+                const token = localStorage['token'];
+                //get episodes
+                const userSavedTracks = await APICtrl.getCurrentSavedTracks(token, 5);
+                userSavedTracks.items.forEach(element => {
+                    UICtrl.createTrackCard(element.track.id, element.track.name, element.track.album.images[0].url, element.track.artists[0].name);
+                });
+                document.querySelectorAll(DOMElements.trackCards).forEach(element => element.addEventListener('click', alternativeWindow));
+                document.querySelector(DOMElements.favoritSongs).innerHTML = `Playlist • ${userSavedTracks.total} songs`
+            }
+
+            async function _getFavoritArtists() {
+                //get token
+                const token = localStorage['token'];
+                //get episodes
+                const userFavoritArtists = await APICtrl.getCurrentSavedArtists(token, 5);
+                userFavoritArtists.artists.items.forEach(element => {
+                    UICtrl.createArtistCard(element.id, element.name, element.images[0].url);
+                });
+                document.querySelectorAll(DOMElements.artistCards).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            async function _getFavoritAlbums() {
+                //get token
+                const token = localStorage['token'];
+                //get episodes
+                const userFavoritAlbums = await APICtrl.getCurrentSavedAlbums(token, 5);
+                userFavoritAlbums.items.forEach(element => {
+                    UICtrl.createAlbumCard(element.album.id, element.album.name, element.album.images[0].url, element.album.artists[0].name);
+                });
+                document.querySelectorAll(DOMElements.albumCards).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            async function _getFavoritPlaylists() {
+                //get token
+                const token = localStorage['token'];
+                //get episodes
+                const userFavoritPlaylists = await APICtrl.getCurrentUserPlaylists(token, 5);
+                userFavoritPlaylists.items.forEach(element => {
+                    UICtrl.createPlaylistCard(element.id, element.name, element.images[0].url, element.owner.display_name);
+                });
+                document.querySelectorAll(DOMElements.playlistCards).forEach(element => element.addEventListener('click', alternativeWindow));
+            }
+
+            _getFavoritPlaylists()
+            _getFavoritAlbums();
+            _getFavoritArtists();
+            _getSavedTracks();
+            _getEpisodes();
         }
 
-        _changeUserInfo();
-        _getUserPlaylists();
+        function _player() {
+            async function getCurrentTrackPlaying() {
+                //get token
+                const token = localStorage['token'];
+                //get episodes
+                const trackPlaying = await APICtrl.getCurrentPlayingTrack(token);
+                console.log(trackPlaying);
+                if (trackPlaying == false) {
+                    document.querySelector(DOMElements.musicPanel).style.visibility = 'hidden';
+                } else {
+                    if (trackPlaying.is_playing == true) {
+                        document.querySelector(DOMElements.pause).style.display = 'flex';
+                        document.querySelector(DOMElements.resume).style.display = 'none';
+                    }
+                    document.querySelector(DOMElements.musicAuthor).innerHTML = trackPlaying.item.artists[0].name;
+                    document.querySelector(DOMElements.musicName).innerHTML = trackPlaying.item.name;
+                    document.querySelector(DOMElements.playerMusicImg).src = trackPlaying.item.album.images[0].url;
+
+                    function setProgressBar(x, y) {
+                        return (x / y) * 100;
+                    }
+
+                    document.querySelector(DOMElements.actualTimeBar).style.width = `${setProgressBar(trackPlaying.progress_ms, trackPlaying.item.duration_ms)}%`;
+
+                }
+            }
+
+            getCurrentTrackPlaying();
+        }
+
+        _player();
+        _mainContent();
+        _lateralSidebar();
     }
+
 
     //remove black screen
     function clarifyApp() {
@@ -463,7 +946,7 @@ const APPController = (function (APICtrl, UICtrl) {
             UICtrl.startDropdowns();
             defaultWindow();
             //get and store token and initiate the API interaction
-            storeToken().then(changeContentWithAPI().then(clarifyApp));
+            storeToken();
         }
     }
 

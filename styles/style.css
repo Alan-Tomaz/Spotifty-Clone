@@ -479,6 +479,11 @@ aside {
     border-radius: 5px;
 }
 
+.artist-item img {
+    width: 48px;
+    height: 48px;
+}
+
 /* .playlist-item:not(:first-child) {
     margin-top: 16px;
 } */
@@ -1397,7 +1402,7 @@ footer {
 }
 
 .actual-time-bar {
-    width: 50%;
+    width: 0%;
     background-color: white;
     border-radius: 5px;
     height: 4px;

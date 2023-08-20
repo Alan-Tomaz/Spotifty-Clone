@@ -5,7 +5,7 @@ localStorage.clear();
 const APIController = (function () {
 
     //redirect url
-    const redirectUri = "http://127.0.0.1:5500/pages/app.html";
+    const redirectUri = `${window.location.href}pages/app.html`;
     //request URL
     const AUTHORIZATION_URL = "https://accounts.spotify.com/authorize";
 
@@ -16,15 +16,15 @@ const APIController = (function () {
         params.append("client_id", clientId);
         params.append("response_type", "code");
         params.append("redirect_uri", encodeURI(redirectUri));
-        params.append("show_dialog", false);
-        params.append("scope", "user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private");
+        params.append("show_dialog", true);
+        params.append("scope", "user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private user-follow-read");
         //redirect to spotify authorization screen
         window.location.href = `${AUTHORIZATION_URL}?${params.toString()}`;
     }
 
     return {
 
-        redirectUri: "http://127.0.0.1:5500/pages/app.html",
+        redirectUri: redirectUri,
 
         requestAuthorization(clientId) {
             _requestAuthorization(clientId);
@@ -58,6 +58,7 @@ const FormValidator = (function (APICtrl) {
                 localStorage['client-id'] = clientId;
                 localStorage['client-secret'] = clientSecret;
                 localStorage['redirect-uri'] = APICtrl.redirectUri;
+                localStorage['root-url'] = window.location.href;
                 //get authorization
                 APICtrl.requestAuthorization(clientId);
             }
