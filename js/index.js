@@ -21,8 +21,8 @@ const FormValidator = (function () {
                 document.querySelector(FormFields.alertMessage).style.display = "flex";
                 document.querySelector(FormFields.alert).innerHTML = "Fill in all Fields!";
             } else {
-                localStorage['client-id'] = document.querySelector(FormFields.clientId).value;
-                localStorage['client-secret'] = document.querySelector(FormFields.clientSecret).value;
+                localStorage.setItem('client-id', document.querySelector(FormFields.clientId).value);
+                localStorage.setItem('client-secret', document.querySelector(FormFields.clientSecret).value);
                 window.location.href = "./pages/app.html";
             }
 

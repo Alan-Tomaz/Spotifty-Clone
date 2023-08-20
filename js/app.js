@@ -26,6 +26,20 @@ const APIController = (function () {
         return data.access_token;
     }
 
+    const _getUserProfile = async () => {
+
+        const result = await fetch('https://api.spotify.com/v1/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        const data = await result.json();
+        return data;
+    }
+
+
     const _getGenres = async (token) => {
 
         const result = await fetch(`https://api.spotify.com/v1/browse/categories?locale=sv_US`, {
@@ -82,6 +96,19 @@ const APIController = (function () {
         return data;
     }
 
+    const _getPlaylists = async (token, limit, offset) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/me/playlists?limit=${limit}&offset=${offset}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        const data = await result.json();
+        return data;
+    }
+
     return {
         getToken() {
             return _getToken();
@@ -97,6 +124,9 @@ const APIController = (function () {
         },
         getTrack(token, trackEndPoint) {
             return _getTrack(token, trackEndPoint);
+        },
+        getPlaylists(token, limit, offset) {
+            return _getPlaylists(token, limit, offset);
         }
     }
 })();
@@ -197,7 +227,9 @@ const APPController = (function (APICtrl, UICtrl) {
         moveRight: '.move-right',
         //Track list
         playlistImg: '#playlist-img',
-        trackHeader: '#track-header'
+        trackHeader: '#track-header',
+        //user elements
+
     }
 
     /* Default Window with the Playlists and Artists */
@@ -380,6 +412,11 @@ const APPController = (function (APICtrl, UICtrl) {
 
     }
 
+    //Get Profile Info
+    function changeUserInfo() {
+
+    }
+
 
     return {
 
@@ -387,6 +424,7 @@ const APPController = (function (APICtrl, UICtrl) {
             console.log("App Is Running")
             UICtrl.startDropdowns();
             defaultWindow();
+            changeUserInfo();
         }
     }
 
