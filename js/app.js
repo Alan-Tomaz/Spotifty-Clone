@@ -7,26 +7,82 @@ localStorage['hasAlternativeWindow'] = false;
 const APIController = (function () {
 
     //APP CREDENTIALS
+    const redirectUri = localStorage['redirect-uri'];
     const clientId = localStorage['client-id'];
     const clientSecret = localStorage['client-secret'];
 
+
     // private methods
-    const _getToken = async () => {
-
-        const result = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
-            },
-            body: 'grant_type=client_credentials'
-        });
-
-        const data = await result.json();
-        return data.access_token;
+    const _checkCode = async () => {
+        const queryString = window.location.search;
+        if (queryString.length > 0) {
+            const urlParams = new URLSearchParams(queryString);
+            const code = urlParams.get('code');
+            localStorage['code'] = code;
+            return code;
+        } else {
+            window.location.href = "http://127.0.0.1:5500"
+        }
     }
 
-    const _getUserProfile = async () => {
+    const _getToken = async (code) => {
+
+        //request a new token
+        if (localStorage['refresh-token'] != undefined || localStorage['token'] != undefined) {
+            const refreshToken = localStorage['refresh-token'];
+            const params = new URLSearchParams();
+            params.append("grant_type", "refresh_token");
+            params.append('refresh_token', refreshToken);
+            params.append('client_id', clientId);
+
+            const result = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+                },
+                body: params
+            });
+
+            const data = await result.json();
+            console.log(data);
+            if (data.error != undefined) {
+                window.location.href = "http://127.0.0.1:5500"
+            } else {
+                localStorage['refresh-token'] = data.refresh_token != undefined ? data.refreshToken : localStorage['refresh-token'];
+                return data.access_token;
+            }
+        }
+        //request a new token to 0
+        else {
+            //request body
+            const params = new URLSearchParams();
+            params.append("grant_type", "authorization_code");
+            params.append('code', code);
+            params.append('redirect_uri', encodeURI(redirectUri));
+            params.append('client_id', clientId);
+            params.append('client_secret', clientSecret);
+
+            console.log(params.toString())
+
+            const result = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+                },
+                body: params
+            });
+
+            const data = await result.json();
+            console.log(data);
+            localStorage['refresh-token'] = data.refresh_token;
+            return data.access_token;
+        }
+    }
+
+
+    const _getUserProfile = async (token) => {
 
         const result = await fetch('https://api.spotify.com/v1/me', {
             method: 'GET',
@@ -40,52 +96,12 @@ const APIController = (function () {
     }
 
 
-    const _getGenres = async (token) => {
-
-        const result = await fetch(`https://api.spotify.com/v1/browse/categories?locale=sv_US`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        const data = await result.json();
-        return data.categories.items;
-    }
-
-    const _getPlaylistByGenre = async (token, genreId) => {
+    const _getCurrentUserPlaylists = async (token) => {
 
         const limit = 10;
+        const offset = 0;
 
-        const result = await fetch(`https://api.spotify.com/v1/browse/categories/${genreId}/playlists?limit=${limit}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        const data = await result.json();
-        return data.playlists.items;
-    }
-
-    const _getTracks = async (token, tracksEndPoint) => {
-
-        const limit = 10;
-
-        const result = await fetch(`${tracksEndPoint}?limit=${limit}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        const data = await result.json();
-        return data.items;
-    }
-
-    const _getTrack = async (token, trackEndPoint) => {
-
-        const result = await fetch(`${trackEndPoint}`, {
+        const result = await fetch(`https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -94,39 +110,21 @@ const APIController = (function () {
 
         const data = await result.json();
         return data;
-    }
 
-    const _getPlaylists = async (token, limit, offset) => {
-
-        const result = await fetch(`https://api.spotify.com/v1/me/playlists?limit=${limit}&offset=${offset}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        const data = await result.json();
-        return data;
     }
 
     return {
-        getToken() {
-            return _getToken();
+        checkCode() {
+            return _checkCode();
         },
-        getGenres(token) {
-            return _getGenres(token);
+        getToken(code) {
+            return _getToken(code);
         },
-        getPlaylistByGenre(token, genreId) {
-            return _getPlaylistByGenre(token, genreId);
+        getUserProfile(token) {
+            return _getUserProfile(token);
         },
-        getTracks(token, tracksEndPoint) {
-            return _getTracks(token, tracksEndPoint);
-        },
-        getTrack(token, trackEndPoint) {
-            return _getTrack(token, trackEndPoint);
-        },
-        getPlaylists(token, limit, offset) {
-            return _getPlaylists(token, limit, offset);
+        getCurrentUserPlaylists(token) {
+            return _getCurrentUserPlaylists(token);
         }
     }
 })();
@@ -197,7 +195,7 @@ const UIController = (function () {
                     isOpen = false;
                 }))
             })
-        }
+        },
     }
 })()
 
@@ -208,6 +206,8 @@ const APPController = (function (APICtrl, UICtrl) {
 
     //Main elements in the APP
     const DOMElements = {
+        //app element
+        app: '#app-main',
         //main element
         mainElement: '.main',
         //main content header
@@ -229,7 +229,10 @@ const APPController = (function (APICtrl, UICtrl) {
         playlistImg: '#playlist-img',
         trackHeader: '#track-header',
         //user elements
-
+        userImg: '#profile-img',
+        forMe: '#for-me',
+        playlistUserImg: '#playlist-user-img',
+        playlistUserName: '#playlist-user-name'
     }
 
     /* Default Window with the Playlists and Artists */
@@ -412,11 +415,46 @@ const APPController = (function (APICtrl, UICtrl) {
 
     }
 
-    //Get Profile Info
-    function changeUserInfo() {
-
+    // Store Token
+    const storeToken = async () => {
+        localStorage['token'] = await APICtrl.getToken(await APICtrl.checkCode());
     }
 
+    //Change content with the data of the API
+    const changeContentWithAPI = async () => {
+
+
+        //Get Profile Info
+        async function _changeUserInfo() {
+            //get token
+            const token = localStorage['token'];
+            //get user info
+            const userProfileData = await APICtrl.getUserProfile(token);
+            //change UI user info
+            document.querySelector(DOMElements.userImg).src = userProfileData.images[0].url;
+            document.querySelector(DOMElements.playlistUserImg).src = userProfileData.images[0].url;
+            document.querySelector(DOMElements.playlistUserName).innerHTML = userProfileData.display_name;
+            document.querySelector(DOMElements.forMe).innerHTML = `Made For ${userProfileData.display_name}`;
+        }
+
+        async function _getUserPlaylists() {
+            //get token
+            const token = localStorage['token'];
+            //get user playlists
+            const userPlaylists = await APICtrl.getCurrentUserPlaylists(token);
+            console.log(userPlaylists);
+        }
+
+        _changeUserInfo();
+        _getUserPlaylists();
+    }
+
+    //remove black screen
+    function clarifyApp() {
+        setTimeout(() => {
+            document.querySelector(DOMElements.app).style.opacity = '1';
+        }, 300);
+    }
 
     return {
 
@@ -424,7 +462,8 @@ const APPController = (function (APICtrl, UICtrl) {
             console.log("App Is Running")
             UICtrl.startDropdowns();
             defaultWindow();
-            changeUserInfo();
+            //get and store token and initiate the API interaction
+            storeToken().then(changeContentWithAPI().then(clarifyApp));
         }
     }
 

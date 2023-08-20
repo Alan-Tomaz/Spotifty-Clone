@@ -2,7 +2,38 @@
 localStorage.clear();
 
 /* =========== Module Pattern ============== */
-const FormValidator = (function () {
+const APIController = (function () {
+
+    //redirect url
+    const redirectUri = "http://127.0.0.1:5500/pages/app.html";
+    //request URL
+    const AUTHORIZATION_URL = "https://accounts.spotify.com/authorize";
+
+    //request authorization
+    const _requestAuthorization = (clientId) => {
+        //object to take URL paramers
+        const params = new URLSearchParams();
+        params.append("client_id", clientId);
+        params.append("response_type", "code");
+        params.append("redirect_uri", encodeURI(redirectUri));
+        params.append("show_dialog", false);
+        params.append("scope", "user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private");
+        //redirect to spotify authorization screen
+        window.location.href = `${AUTHORIZATION_URL}?${params.toString()}`;
+    }
+
+    return {
+
+        redirectUri: "http://127.0.0.1:5500/pages/app.html",
+
+        requestAuthorization(clientId) {
+            _requestAuthorization(clientId);
+        }
+    }
+
+})();
+
+const FormValidator = (function (APICtrl) {
 
     const FormFields = {
         clientId: '#client-id',
@@ -21,9 +52,14 @@ const FormValidator = (function () {
                 document.querySelector(FormFields.alertMessage).style.display = "flex";
                 document.querySelector(FormFields.alert).innerHTML = "Fill in all Fields!";
             } else {
-                localStorage.setItem('client-id', document.querySelector(FormFields.clientId).value);
-                localStorage.setItem('client-secret', document.querySelector(FormFields.clientSecret).value);
-                window.location.href = "./pages/app.html";
+                //get and save client credentials
+                const clientId = document.querySelector(FormFields.clientId).value;
+                const clientSecret = document.querySelector(FormFields.clientSecret).value;
+                localStorage['client-id'] = clientId;
+                localStorage['client-secret'] = clientSecret;
+                localStorage['redirect-uri'] = APICtrl.redirectUri;
+                //get authorization
+                APICtrl.requestAuthorization(clientId);
             }
 
         })
@@ -36,7 +72,7 @@ const FormValidator = (function () {
         }
     }
 
-})()
+})(APIController)
 
 //Start Form Validation
 FormValidator.init();

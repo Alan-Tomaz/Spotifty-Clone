@@ -226,6 +226,11 @@ h6.alert-disclaimer {
 
 /* ============== APP LAYOUT ================  */
 
+.app {
+    opacity: 0;
+    transition: .3s ease all;
+}
+
 main {
     position: relative;
     padding: 8px;
