@@ -195,6 +195,133 @@ const APIController = (function () {
 
     }
 
+    const _getTrack = async (token, trackId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getEpisode = async (token, episodeId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/episodes/${episodeId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentPlaylistInfo = async (token, playlistId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentAlbumInfo = async (token, albumId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/albums/${albumId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentArtistInfo = async (token, artistId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentEpisodes = async (token, limit) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/episodes?limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentPlaylistTracks = async (token, playlistId, limit) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentAlbumTracks = async (token, albumId, limit) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/albums/${albumId}/tracks?limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+    const _getCurrentArtistTopTracks = async (token, artistId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+
     return {
         checkCode() {
             return _checkCode();
@@ -222,7 +349,35 @@ const APIController = (function () {
         },
         getCurrentPlayingTrack(token) {
             return _getCurrentPlayingTrack(token);
+        },
+        getTrack(token, trackId) {
+            return _getTrack(token, trackId);
+        },
+        getEpisode(token, episodeId) {
+            return _getEpisode(token, episodeId);
+        },
+        getCurrentPlaylistInfo(token, playlistId) {
+            return _getCurrentPlaylistInfo(token, playlistId);
+        },
+        getCurrentAlbumInfo(token, albumId) {
+            return _getCurrentAlbumInfo(token, albumId);
+        },
+        getCurrentArtistInfo(token, artistId) {
+            return _getCurrentArtistInfo(token, artistId);
+        },
+        getCurrentEpisodes(token, limit) {
+            return _getCurrentEpisodes(token, limit);
+        },
+        getCurrentPlaylistTracks(token, trackId, limit) {
+            return _getCurrentPlaylistTracks(token, trackId, limit);
+        },
+        getCurrentAlbumTracks(token, trackId, limit) {
+            return _getCurrentAlbumTracks(token, trackId, limit);
+        },
+        getCurrentArtistTopTracks(token, artistId) {
+            return _getCurrentArtistTopTracks(token, artistId);
         }
+
     }
 })();
 
@@ -344,7 +499,7 @@ const UIController = (function () {
 
         createPlaylist(id, name, imgUrl, userName) {
             const html = `
-            <li class="playlist-item" id="${id}">
+            <li class="playlist-item playlist-item-1" id="${id}">
                 <div class="playlist">
                     <div class="playlist-img">
                         <img src="${imgUrl}" alt="playlist-img">
@@ -584,13 +739,13 @@ const APPController = (function (APICtrl, UICtrl) {
         function showWindow() {
             document.querySelector(DOMElements.mixSection).style.display = 'flex';
             document.querySelector(DOMElements.gradient1).style.display = 'flex';
+            document.querySelector(DOMElements.playTrack).style.opacity = '0';
         }
 
         function hideAlternativeWindow() {
             document.querySelector(DOMElements.playlistBand).style.display = 'none';
             document.querySelector(DOMElements.playlistPlay).style.display = 'none';
             document.querySelector(DOMElements.playlistTracks).style.display = 'none';
-            document.querySelector(DOMElements.playTrack).style.opacity = '0';
         }
 
         function nextWindow() {
@@ -605,12 +760,12 @@ const APPController = (function (APICtrl, UICtrl) {
         // Change the Header color on scroll
         function changeHeaderOnScrollDefault() {
             document.querySelector(DOMElements.mainHeader).style.background.color = "transparent";
-            document.querySelector(DOMElements.playTrack).style.opacity = '0';
             document.querySelector(DOMElements.playTrack).style.cursor = 'default';
 
             document.querySelector(DOMElements.mainElement).addEventListener('scroll', (event) => {
                 document.querySelector(DOMElements.mainHeader).style.backgroundColor = "#121212";
                 if (document.querySelector(DOMElements.mainElement).scrollTop >= 100) {
+                    document.querySelector(DOMElements.playTrack).style.opacity = '0';
                     document.querySelector(DOMElements.mainHeader).style.backgroundColor = "#121212";
                     document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = 'transparent';
                 }
@@ -684,6 +839,32 @@ const APPController = (function (APICtrl, UICtrl) {
 
     function alternativeWindow() {
 
+        const midiaId = this;
+        console.log(midiaId)
+        async function changeWindow() {
+            if (midiaId.id != "") {
+                switch (midiaId) {
+                    case (midiaId.classList.contains('playlist-item-1')):
+                    case (midiaId.classList.contains('playlist-cards')):
+                        //get token
+                        const token = localStorage['token'];
+                        //get tracks
+                        const playlistInfo = await APICtrl.getCurrentPlaylistInfo(token, midiaId.id);
+                        const playlistTracks = await APICtrl.getCurrentPlaylistTracks(token, midiaId.id, 20);
+                        console.log(playlistInfo);
+                        playlistTracks.items.forEach((element, index) => {
+                            UICtrl.createTrack(index, element.id, element.name, element.album.images[0].url, element.artists[0].name, element.album.name, element.added_at, element.duration_ms);
+                        });
+
+                        break;
+                }
+            } else if (midiaId == "episodes") {
+
+            } else if (midiaId != "favorits") {
+
+            }
+        }
+
         //Show the Default Window
         function hideWindow() {
             document.querySelector(DOMElements.mixSection).style.display = 'none';
@@ -752,6 +933,7 @@ const APPController = (function (APICtrl, UICtrl) {
             document.querySelector(DOMElements.gradient2).style.backgroundColor = `rgb(${RGB.r}, ${RGB.g}, ${RGB.b}, 0.5)`
         }
 
+        changeWindow();
         changeBackgroundColor();
         changeHeaderOnScrollAlternative();
         previousWindow();
@@ -902,7 +1084,6 @@ const APPController = (function (APICtrl, UICtrl) {
                 const token = localStorage['token'];
                 //get episodes
                 const trackPlaying = await APICtrl.getCurrentPlayingTrack(token);
-                console.log(trackPlaying);
                 if (trackPlaying == false) {
                     document.querySelector(DOMElements.musicPanel).style.visibility = 'hidden';
                 } else {

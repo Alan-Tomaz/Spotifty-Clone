@@ -1,6 +1,6 @@
 # Spotify Clone
 
-### A spotify clone created using HTML, CSS and JavaScript (with Fetch API and Module Pattern) together with the Spotify API.
+### A spotify clone created using HTML, CSS and JavaScript (with Fetch API and Module Pattern) together with the **[Spotify API](https://developer.spotify.com/documentation/web-api)**.
 
 ![Main Page](https://i.imgur.com/gGPsF0n.png)
 
