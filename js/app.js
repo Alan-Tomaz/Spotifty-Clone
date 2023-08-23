@@ -223,6 +223,21 @@ const APIController = (function () {
         return data;
     }
 
+    const _getUser = async (token, userId) => {
+
+        const result = await fetch(`https://api.spotify.com/v1/users/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+
+        const data = await result.json();
+        return data;
+    }
+
+
     const _getCurrentPlaylistInfo = async (token, playlistId) => {
 
         const result = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
@@ -355,6 +370,9 @@ const APIController = (function () {
         },
         getEpisode(token, episodeId) {
             return _getEpisode(token, episodeId);
+        },
+        getUser(token, userId) {
+            return _getUser(token, userId);
         },
         getCurrentPlaylistInfo(token, playlistId) {
             return _getCurrentPlaylistInfo(token, playlistId);
@@ -730,7 +748,17 @@ const APPController = (function (APICtrl, UICtrl) {
         actualVolume: '.actualVolume',
         pause: '.pause',
         resume: '.resume',
-        musicBtn: '.music-btn'
+        musicBtn: '.music-btn',
+        //top alternative window elements
+        playlistImg: '#playlist-img',
+        playlistCover: '.playlist-cover',
+        playlistType: '.playlist-type',
+        playlistName: '.playlist-name',
+        playlistUserImg: '#playlist-user-img',
+        playlistDetail1: '.playlist-detail-1',
+        playlistDetail3: '.playlist-detail-3',
+        playlistDetail4: '.playlist-detail-4',
+        playlistDetail5: '.playlist-detail-5',
     }
 
     /* Default Window with the Playlists and Artists */
@@ -837,27 +865,88 @@ const APPController = (function (APICtrl, UICtrl) {
 
     }
 
-    function alternativeWindow() {
+    async function alternativeWindow() {
 
         const midiaId = this;
-        console.log(midiaId)
-        async function changeWindow() {
-            if (midiaId.id != "") {
-                switch (midiaId) {
-                    case (midiaId.classList.contains('playlist-item-1')):
-                    case (midiaId.classList.contains('playlist-cards')):
-                        //get token
-                        const token = localStorage['token'];
-                        //get tracks
-                        const playlistInfo = await APICtrl.getCurrentPlaylistInfo(token, midiaId.id);
-                        const playlistTracks = await APICtrl.getCurrentPlaylistTracks(token, midiaId.id, 20);
-                        console.log(playlistInfo);
-                        playlistTracks.items.forEach((element, index) => {
-                            UICtrl.createTrack(index, element.id, element.name, element.album.images[0].url, element.artists[0].name, element.album.name, element.added_at, element.duration_ms);
-                        });
 
-                        break;
+        async function changeWindow() {
+
+            function getMidiaAlbumDuration(tracks) {
+                let tracksDuration = 0;
+                let durationHours = 0;
+                let durationMinutes = 0;
+                let durationSeconds = 0;
+                tracks.items.forEach(element => {
+                    tracksDuration += element.track.duration_ms;
+                })
+                if ((((tracksDuration / 1000) / 60) / 60) >= 1) {
+                    durationHours = ((((tracksDuration / 1000) / 60) / 60)).toFixed(0);
+                    return `about ${durationHours} hr`;
                 }
+                if (((tracksDuration / 1000) / 60) >= 1) {
+                    durationMinutes = (((tracksDuration / 1000) / 60)).toFixed(0);
+                    tracksDuration -= ((durationMinutes * 1000) * 60);
+                }
+                if ((tracksDuration / 1000) >= 1) {
+                    durationSeconds = (tracksDuration / 1000).toFixed(0);
+                }
+
+                if (durationSeconds != 0) {
+                    return `${durationMinutes} min ${durationSeconds} sec`
+                }
+
+                return `${durationMinutes} min`
+
+            }
+
+            function changeWindowToPlaylist(playlistInfo, playlistTracks) {
+
+                async function changeTopInfo() {
+                    document.querySelector(DOMElements.playlistImg).src = playlistInfo.images[0].url;
+                    document.querySelector(DOMElements.playlistType).innerHTML = "Playlist";
+                    document.querySelector(DOMElements.playlistName).innerHTML = playlistInfo.name;
+
+                    //get token
+                    const token = localStorage['token'];
+                    //get user Info
+                    const userInfo = await APICtrl.getUser(token, playlistInfo.owner.id);
+                    console.log(playlistTracks);
+
+
+                    document.querySelector(DOMElements.playlistUserImg).src = userInfo.images[0].url;
+                    document.querySelector(DOMElements.playlistUserName).innerHTML = userInfo.display_name;
+
+                    document.querySelector(DOMElements.playlistDetail4).innerHTML = `${playlistInfo.tracks.total} songs,`;
+
+                    document.querySelector(DOMElements.playlistDetail5).innerHTML = getMidiaAlbumDuration(playlistTracks);
+                }
+
+                function changeBottomInfo(playlistTracks) {
+                    /*  playlistTracks.items.forEach((element, index) => {
+                        UICtrl.createTrack(index, element.id, element.name, element.album.images[0].url, element.artists[0].name, element.album.name, element.added_at, element.duration_ms);
+                    }); */
+                }
+
+                changeTopInfo();
+                changeBottomInfo();
+
+            }
+
+            if (midiaId.id != "") {
+                document.querySelector(DOMElements.app).style.opacity = '0';
+                document.querySelector(DOMElements.app).style.transition = '.3s';
+
+                if (midiaId.classList.contains('playlist-item-1') == true || midiaId.classList.contains('playlist-cards') == true) {
+                    //get token
+                    const token = localStorage['token'];
+                    //get playlist info
+                    const playlistInfo = await APICtrl.getCurrentPlaylistInfo(token, midiaId.id);
+                    //get playlist tracks
+                    const playlistTracks = await APICtrl.getCurrentPlaylistTracks(token, midiaId.id, 20);
+                    console.log(playlistInfo);
+                    changeWindowToPlaylist(playlistInfo, playlistTracks);
+                }
+
             } else if (midiaId == "episodes") {
 
             } else if (midiaId != "favorits") {
@@ -872,6 +961,7 @@ const APPController = (function (APICtrl, UICtrl) {
         }
 
         function showAlternativeWindow() {
+            document.querySelector(DOMElements.app).style.opacity = '1';
             document.querySelector(DOMElements.playlistBand).style.display = 'flex';
             document.querySelector(DOMElements.playlistPlay).style.display = 'flex';
             document.querySelector(DOMElements.playlistTracks).style.display = 'grid';
@@ -933,8 +1023,8 @@ const APPController = (function (APICtrl, UICtrl) {
             document.querySelector(DOMElements.gradient2).style.backgroundColor = `rgb(${RGB.r}, ${RGB.g}, ${RGB.b}, 0.5)`
         }
 
-        changeWindow();
-        changeBackgroundColor();
+        await changeWindow();
+        /* changeBackgroundColor(); */
         changeHeaderOnScrollAlternative();
         previousWindow();
         hideWindow();

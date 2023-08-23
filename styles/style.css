@@ -905,9 +905,15 @@ aside {
 .playlist-detail-3 {
     font-size: 14px;
     color: var(--text-color);
+    display: none;
 }
 
 .playlist-detail-4 {
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.playlist-detail-5 {
     color: var(--grey-color);
     font-size: 14px;
     margin-left: 4px;
