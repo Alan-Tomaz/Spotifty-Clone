@@ -408,7 +408,9 @@ const UIController = (function () {
         mainFavorits: '.main-favorits',
         favoritArtists: '.favorit-artists',
         favoritAlbums: '.favorit-albums',
-        favoritPlaylists: '.favorit-playlists'
+        favoritPlaylists: '.favorit-playlists',
+        //bottom alternative window elements
+        tracksBody: '.tracks-body'
     }
 
     function _formatTime(time) {
@@ -440,6 +442,55 @@ const UIController = (function () {
                 month = 'Dec';
         }
         return month + " " + time[0];
+    }
+
+    function _formatAddedTime(time) {
+        const newTime = time.split('-');
+        let month;
+        switch (newTime[1]) {
+            case '01':
+                month = 'Jan';
+            case '02':
+                month = 'Feb';
+            case '03':
+                month = 'Mar';
+            case '04':
+                month = 'Apr';
+            case '05':
+                month = 'May';
+            case '06':
+                month = 'Jun';
+            case '07':
+                month = 'Jul';
+            case '08':
+                month = 'Aug';
+            case '09':
+                month = 'Sep';
+            case '10':
+                month = 'Oct';
+            case '11':
+                month = 'Nov';
+            case '12':
+                month = 'Dec';
+        }
+        return `${month} ${newTime[2].slice(0, 2)}, ${newTime[0]} `;
+    }
+
+    function _trackDuration(durationMs) {
+        let durationTrack = durationMs;
+        const trackDurationMin = Math.floor((durationMs / 1000) / 60).toFixed(0);
+        durationTrack = durationTrack - ((trackDurationMin * 1000) * 60);
+        if ((durationTrack / 1000) >= 1) {
+            const trackDurationSec = Math.floor(durationTrack / 1000).toFixed(0);
+
+            if (trackDurationSec > 9) {
+                return `${trackDurationMin} : ${trackDurationSec}`
+            } else {
+                return `${trackDurationMin} : 0${trackDurationSec}`
+            }
+        } else {
+            return `${trackDurationMin} : 00`
+        }
     }
 
     function _formatName(newName) {
@@ -690,6 +741,47 @@ const UIController = (function () {
             </div>
             `
             document.querySelector(DOMElements.favoritPlaylists).insertAdjacentHTML('beforeend', html);
+        },
+
+        createTrack(trackIndex, trackId, trackName, trackImg, trackArtistName, trackArtistId, trackAlbumName, trackAlbumId, trackAddedDate, trackDuration) {
+            const html = `
+                        <div class="track-row" id="${trackId}">
+                                <div class="track-num track-item">
+                                    <span class="track-number">${trackIndex + 1}</span>
+                                    <svg role="img" height="16" width="16" aria-hidden="true" class="track-play" viewBox="0 0 24 24" data-encore-id="icon">
+                                        <path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="track-name track-item">
+                                    <img src="${trackImg}" alt="">
+                                    <div class="track-info">
+                                        <p class="track-name-info">${trackName}</p>
+                                        <p class="track-author" id="${trackArtistId}">${trackArtistName}</p>
+                                    </div>
+                                </div>
+                                <div class="track-album track-item" id="${trackAlbumId}">${trackAlbumName}</div>
+                                <div class="track-added track-item">${_formatAddedTime(trackAddedDate)}</div>
+                                <div class="track-time track-item">
+                                    <div class="track-favorite">
+                                        <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq">
+                                            <path d="M1.69 2A4.582 4.582 0 0 1 8 2.023 4.583 4.583 0 0 1 11.88.817h.002a4.618 4.618 0 0 1 3.782 3.65v.003a4.543 4.543 0 0 1-1.011 3.84L9.35 14.629a1.765 1.765 0 0 1-2.093.464 1.762 1.762 0 0 1-.605-.463L1.348 8.309A4.582 4.582 0 0 1 1.689 2zm3.158.252A3.082 3.082 0 0 0 2.49 7.337l.005.005L7.8 13.664a.264.264 0 0 0 .311.069.262.262 0 0 0 .09-.069l5.312-6.33a3.043 3.043 0 0 0 .68-2.573 3.118 3.118 0 0 0-2.551-2.463 3.079 3.079 0 0 0-2.612.816l-.007.007a1.501 1.501 0 0 1-2.045 0l-.009-.008a3.082 3.082 0 0 0-2.121-.861z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="track-timing">
+                                       ${_trackDuration(trackDuration)}
+                                    </div>
+                                    <div class="track-menu track-item">
+                                        <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq">
+                                            <path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+            document.querySelector(DOMElements.tracksBody).insertAdjacentHTML('beforeend', html);
         }
     }
 })()
@@ -749,8 +841,7 @@ const APPController = (function (APICtrl, UICtrl) {
         pause: '.pause',
         resume: '.resume',
         musicBtn: '.music-btn',
-        //top alternative window elements
-        playlistImg: '#playlist-img',
+        //top alternative window elements,
         playlistCover: '.playlist-cover',
         playlistType: '.playlist-type',
         playlistName: '.playlist-name',
@@ -811,59 +902,13 @@ const APPController = (function (APICtrl, UICtrl) {
         changeHeaderOnScrollDefault();
     }
 
-    function getAverageRGB(imgEl) {
-
-        var blockSize = 5, // only visit every 5 pixels
-            defaultRGB = {
-                r: 0,
-                g: 0,
-                b: 0
-            }, // for non-supporting envs
-            canvas = document.createElement('canvas'),
-            context = canvas.getContext && canvas.getContext('2d'),
-            data, width, height,
-            i = -4,
-            length,
-            rgb = {
-                r: 0,
-                g: 0,
-                b: 0
-            },
-            count = 0;
-
-        if (!context) {
-            return defaultRGB;
-        }
-
-        height = canvas.height = imgEl.naturalHeight || imgEl.offsetHeight || imgEl.height;
-        width = canvas.width = imgEl.naturalWidth || imgEl.offsetWidth || imgEl.width;
-
-        context.drawImage(imgEl, 0, 0);
-
-        try {
-            data = context.getImageData(0, 0, width, height);
-        } catch (e) {
-            /* security error, img on diff domain */
-            return defaultRGB;
-        }
-
-        length = data.data.length;
-
-        while ((i += blockSize * 4) < length) {
-            ++count;
-            rgb.r += data.data[i];
-            rgb.g += data.data[i + 1];
-            rgb.b += data.data[i + 2];
-        }
-
-        // ~~ used to floor values
-        rgb.r = ~~(rgb.r / count);
-        rgb.g = ~~(rgb.g / count);
-        rgb.b = ~~(rgb.b / count);
-
-        return rgb;
-
+    function getAverageRGB(imgId) {
+        const img = document.querySelector(imgId)
+        const colorThief = new ColorThief();
+        const RGB = colorThief.getColor(img);
+        return RGB;
     }
+
 
     async function alternativeWindow() {
 
@@ -921,10 +966,10 @@ const APPController = (function (APICtrl, UICtrl) {
                     document.querySelector(DOMElements.playlistDetail5).innerHTML = getMidiaAlbumDuration(playlistTracks);
                 }
 
-                function changeBottomInfo(playlistTracks) {
-                    /*  playlistTracks.items.forEach((element, index) => {
-                        UICtrl.createTrack(index, element.id, element.name, element.album.images[0].url, element.artists[0].name, element.album.name, element.added_at, element.duration_ms);
-                    }); */
+                function changeBottomInfo() {
+                    playlistTracks.items.forEach((element, index) => {
+                        UICtrl.createTrack(index, element.track.id, element.track.name, element.track.album.images[0].url, element.track.artists[0].name, element.track.artists[0].id, element.track.album.name, element.track.album.id, element.added_at, element.track.duration_ms);
+                    });
                 }
 
                 changeTopInfo();
@@ -943,7 +988,6 @@ const APPController = (function (APICtrl, UICtrl) {
                     const playlistInfo = await APICtrl.getCurrentPlaylistInfo(token, midiaId.id);
                     //get playlist tracks
                     const playlistTracks = await APICtrl.getCurrentPlaylistTracks(token, midiaId.id, 20);
-                    console.log(playlistInfo);
                     changeWindowToPlaylist(playlistInfo, playlistTracks);
                 }
 
@@ -980,9 +1024,9 @@ const APPController = (function (APICtrl, UICtrl) {
                 document.querySelector(DOMElements.mainHeader).style.backgroundColor = "#121212";
                 if (document.querySelector(DOMElements.mainElement).scrollTop >= 300) {
                     //Change The Header COlor
-                    const RGB = getAverageRGB(document.querySelector(DOMElements.playlistImg));
+                    const RGB = getAverageRGB(DOMElements.playlistImg);
                     document.querySelector(DOMElements.mainHeader).style.backgroundColor = `#121212`;
-                    document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = `rgb(${RGB.r}, ${RGB.g}, ${RGB.b}, 0.5)`;
+                    document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = `rgb(${RGB}, 0.5)`;
                 }
                 if (document.querySelector(DOMElements.mainElement).scrollTop < 300) {
                     document.querySelector(DOMElements.mainHeader).style.backgroundColor = "transparent";
@@ -1016,15 +1060,15 @@ const APPController = (function (APICtrl, UICtrl) {
 
         function changeBackgroundColor() {
 
-            const RGB = getAverageRGB(document.querySelector(DOMElements.playlistImg));
+            const RGB = getAverageRGB(DOMElements.playlistImg);
             //change band color
-            document.querySelector(DOMElements.playlistBand).style.background = `linear-gradient(rgb(${RGB.r}, ${RGB.g}, ${RGB.b}) 0,rgb(${RGB.r}, ${RGB.g}, ${RGB.b}, 0.5) 100%),var(--background-noise)`;
+            document.querySelector(DOMElements.playlistBand).style.background = `linear-gradient(rgb(${RGB}) 0,rgb(${RGB}, 0.5) 100%),var(--background-noise)`;
             //change the play btn background color
-            document.querySelector(DOMElements.gradient2).style.backgroundColor = `rgb(${RGB.r}, ${RGB.g}, ${RGB.b}, 0.5)`
+            document.querySelector(DOMElements.gradient2).style.backgroundColor = `rgb(${RGB}, 0.5)`
         }
 
         await changeWindow();
-        /* changeBackgroundColor(); */
+        changeBackgroundColor();
         changeHeaderOnScrollAlternative();
         previousWindow();
         hideWindow();
