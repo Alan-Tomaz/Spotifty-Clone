@@ -493,9 +493,9 @@ const UIController = (function () {
         }
     }
 
-    function _formatName(newName) {
-        if (newName.length >= 20) {
-            return newName.slice(0, 20) + '...';
+    function _formatName(newName, limit) {
+        if (newName.length >= limit) {
+            return newName.slice(0, limit) + '...';
         } else {
             return newName;
         }
@@ -574,7 +574,7 @@ const UIController = (function () {
                         <img src="${imgUrl}" alt="playlist-img">
                     </div>
                     <div class="playlist-info">
-                        <h3 id="playlist-name">${_formatName(name)}</h3>
+                        <h3 id="playlist-name">${_formatName(name, 20)}</h3>
                         <p id="left-card-type">
                             Playlist • ${userName} 
                         </p>
@@ -593,7 +593,7 @@ const UIController = (function () {
                         <img src="${imgUrl}" alt="playlist-img">
                     </div>
                     <div class="playlist-info">
-                        <h3 id="playlist-name">${_formatName(name)}</h3>
+                        <h3 id="playlist-name">${_formatName(name, 20)}</h3>
                         <p id="left-card-type">
                             Album • ${artist} 
                         </p>
@@ -612,7 +612,7 @@ const UIController = (function () {
                     <img src="${imgUrl}" alt="artist-img">
                 </div>
                 <div class="playlist-info">
-                    <h3 id="artist-name">${_formatName(name)}</h3>
+                    <h3 id="artist-name">${_formatName(name, 20)}</h3>
                     <p id="left-card-type">
                         Artist
                     </p>
@@ -639,7 +639,7 @@ const UIController = (function () {
                             </button>
                 </div>
                 <div class="card-info">
-                <h3 class="card-title">${_formatName(name)}</h3>
+                <h3 class="card-title">${_formatName(name, 20)}</h3>
                     <h4 class="card-artist">${_formatTime(date)}</h4>
                 </div>
             </div>
@@ -687,7 +687,7 @@ const UIController = (function () {
                     </button>
                 </div>
                 <div class="card-info">
-                    <h3 class="card-title">${_formatName(artistName)}</h3>
+                    <h3 class="card-title">${_formatName(artistName, 20)}</h3>
                     <h4 class="card-artist">Artist</h4>
                 </div>
             </div>
@@ -735,7 +735,7 @@ const UIController = (function () {
                     </button>
                 </div>
                 <div class="card-info">
-                    <h3 class="card-title">${_formatName(name)}</h3>
+                    <h3 class="card-title">${_formatName(name, 20)}</h3>
                     <h4 class="card-artist">Playlist • ${ownerName}</h4>
                 </div>
             </div>
@@ -756,11 +756,11 @@ const UIController = (function () {
                                 <div class="track-name track-item">
                                     <img src="${trackImg}" alt="">
                                     <div class="track-info">
-                                        <p class="track-name-info">${trackName}</p>
-                                        <p class="track-author" id="${trackArtistId}">${trackArtistName}</p>
+                                        <p class="track-name-info">${_formatName(trackName, 30)}</p>
+                                        <p class="track-author" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
                                     </div>
                                 </div>
-                                <div class="track-album track-item" id="${trackAlbumId}">${trackAlbumName}</div>
+                                <div class="track-album track-item" id="${trackAlbumId}">${_formatName(trackAlbumName, 50)}</div>
                                 <div class="track-added track-item">${_formatAddedTime(trackAddedDate)}</div>
                                 <div class="track-time track-item">
                                     <div class="track-favorite">
@@ -850,6 +850,7 @@ const APPController = (function (APICtrl, UICtrl) {
         playlistDetail3: '.playlist-detail-3',
         playlistDetail4: '.playlist-detail-4',
         playlistDetail5: '.playlist-detail-5',
+        tracksBody: '.tracks-body'
     }
 
     /* Default Window with the Playlists and Artists */
@@ -902,13 +903,20 @@ const APPController = (function (APICtrl, UICtrl) {
         changeHeaderOnScrollDefault();
     }
 
-    function getAverageRGB(imgId) {
+    function getAverageRGB(imgId, myFunction) {
         const img = document.querySelector(imgId)
-        const colorThief = new ColorThief();
-        const RGB = colorThief.getColor(img);
-        return RGB;
-    }
+        const image = new Image();
+        image.crossOrigin = "Anonymous"; // Permite carregar imagens de diferentes domínios
+        image.src = img.src;
 
+        image.onload = function () {
+            const colorThief = new ColorThief();
+            const dominantColor = colorThief.getColor(image); // Obtém a cor predominante
+
+            const RGB = `${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}`;
+            myFunction(RGB);
+        };
+    }
 
     async function alternativeWindow() {
 
@@ -967,6 +975,7 @@ const APPController = (function (APICtrl, UICtrl) {
                 }
 
                 function changeBottomInfo() {
+                    document.querySelector(DOMElements.tracksBody).innerHTML = '';
                     playlistTracks.items.forEach((element, index) => {
                         UICtrl.createTrack(index, element.track.id, element.track.name, element.track.album.images[0].url, element.track.artists[0].name, element.track.artists[0].id, element.track.album.name, element.track.album.id, element.added_at, element.track.duration_ms);
                     });
@@ -1021,19 +1030,20 @@ const APPController = (function (APICtrl, UICtrl) {
         function changeHeaderOnScrollAlternative() {
             document.querySelector(DOMElements.mainHeader).style.background.color = "transparent";
             document.querySelector(DOMElements.mainElement).addEventListener('scroll', (event) => {
-                document.querySelector(DOMElements.mainHeader).style.backgroundColor = "#121212";
+
                 if (document.querySelector(DOMElements.mainElement).scrollTop >= 300) {
                     //Change The Header COlor
-                    const RGB = getAverageRGB(DOMElements.playlistImg);
-                    document.querySelector(DOMElements.mainHeader).style.backgroundColor = `#121212`;
-                    document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = `rgb(${RGB}, 0.5)`;
-                }
-                if (document.querySelector(DOMElements.mainElement).scrollTop < 300) {
-                    document.querySelector(DOMElements.mainHeader).style.backgroundColor = "transparent";
-                    document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = 'transparent';
+                    getAverageRGB(DOMElements.playlistImg, function (RGB) {
+                        document.querySelector(DOMElements.mainHeader).style.backgroundColor = `rgb(${RGB}, 1)`;
+                        document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = `rgb(${RGB}, 1)`;
+                    });
                 }
 
                 if (document.querySelector(DOMElements.mainElement).scrollTop >= 400) {
+                    getAverageRGB(DOMElements.playlistImg, function (RGB) {
+                        document.querySelector(DOMElements.mainHeader).style.backgroundColor = `rgb(${RGB}, 1)`;
+                        document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = `rgb(${RGB}, 1)`;
+                    });
                     //Show Play Button
                     document.querySelector(DOMElements.playTrack).style.opacity = '1';
                     document.querySelector(DOMElements.playTrack).style.cursor = 'pointer';
@@ -1042,9 +1052,17 @@ const APPController = (function (APICtrl, UICtrl) {
                     document.querySelector(DOMElements.trackHeader).style.margin = '0';
                     document.querySelector(DOMElements.trackHeader).style.padding = '0px 40px';
                     document.querySelector(DOMElements.trackHeader).style.borderBottom = '1px solid hsla(0, 0%, 100%, .1)';
+
                 }
 
-                if (document.querySelector(DOMElements.mainElement).scrollTop < 400) {
+                if (document.querySelector(DOMElements.mainElement).scrollTop < 300) {
+                    document.querySelector(DOMElements.mainHeader).style.backgroundColor = "transparent";
+                    document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = 'transparent';
+                } else if (document.querySelector(DOMElements.mainElement).scrollTop < 400) {
+                    getAverageRGB(DOMElements.playlistImg, function (RGB) {
+                        document.querySelector(DOMElements.mainHeader).style.backgroundColor = `rgb(${RGB}, 1)`;
+                        document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = `rgb(${RGB}, 1)`;
+                    });
                     //Hide Play Button
                     document.querySelector(DOMElements.playTrack).style.opacity = '0';
                     document.querySelector(DOMElements.playTrack).style.cursor = 'default';
@@ -1053,6 +1071,7 @@ const APPController = (function (APICtrl, UICtrl) {
                     document.querySelector(DOMElements.trackHeader).style.margin = '0 24px';
                     document.querySelector(DOMElements.trackHeader).style.padding = '0px 16px';
                     document.querySelector(DOMElements.trackHeader).style.borderBottom = '1px solid hsla(0, 0%, 100%, .1)';
+
                 }
 
             })
@@ -1060,11 +1079,12 @@ const APPController = (function (APICtrl, UICtrl) {
 
         function changeBackgroundColor() {
 
-            const RGB = getAverageRGB(DOMElements.playlistImg);
-            //change band color
-            document.querySelector(DOMElements.playlistBand).style.background = `linear-gradient(rgb(${RGB}) 0,rgb(${RGB}, 0.5) 100%),var(--background-noise)`;
-            //change the play btn background color
-            document.querySelector(DOMElements.gradient2).style.backgroundColor = `rgb(${RGB}, 0.5)`
+            getAverageRGB(DOMElements.playlistImg, function (RGB) {
+                //change band color
+                document.querySelector(DOMElements.playlistBand).style.background = `linear-gradient(rgb(${RGB}) 0,rgb(${RGB}, 0.5) 100%),var(--background-noise)`;
+                //change the play btn background color
+                document.querySelector(DOMElements.gradient2).style.backgroundColor = `rgb(${RGB}, 1)`
+            });
         }
 
         await changeWindow();

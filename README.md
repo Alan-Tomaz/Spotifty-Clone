@@ -13,6 +13,9 @@ The site allows the user to log into their **Spotify** account and view their in
 - View the song that is currently playing on true spotify;
 - Information from your profile, such as avatar and display name;
 
+
+![Music Page](https://i.imgur.com/V6ceES9.png)
+
 And in addition, it is also possible to view the songs related to albums, playlists and artists.
 
 ## How to access the website
