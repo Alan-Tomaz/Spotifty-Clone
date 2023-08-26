@@ -663,7 +663,7 @@ const UIController = (function () {
                     </button>
                 </div>
                 <div class="card-info">
-                <h3 class="card-title">${_formatName(name)}</h3>
+                <h3 class="card-title">${_formatName(name, 20)}</h3>
                 <h4 class="card-artist">${artist}</h4>
                 </div>
             </div>
@@ -789,8 +789,6 @@ const UIController = (function () {
 //APP Controller Module
 const APPController = (function (APICtrl, UICtrl) {
 
-    localStorage['hasAlternativeWindow'] = true;
-
     //Main elements in the APP
     const DOMElements = {
         //app element
@@ -853,6 +851,8 @@ const APPController = (function (APICtrl, UICtrl) {
         tracksBody: '.tracks-body'
     }
 
+    let changeHeaderFunction;
+
     /* Default Window with the Playlists and Artists */
     function defaultWindow() {
         //Show the Default Window
@@ -874,15 +874,18 @@ const APPController = (function (APICtrl, UICtrl) {
                 document.querySelector(DOMElements.moveRight).style.color = "white";
                 document.querySelector(DOMElements.moveRight).style.cursor = "pointer";
                 document.querySelector(DOMElements.moveRight).addEventListener('click', alternativeWindow);
+                document.querySelector(DOMElements.moveLeft).style.cursor = 'not-allowed';
+                document.querySelector(DOMElements.moveLeft).style.backgroundColor = "rgba(0, 0, 0, 0.35)"
+                document.querySelector(DOMElements.moveLeft).style.color = "#b3b3b3";
             }
         }
 
         // Change the Header color on scroll
         function changeHeaderOnScrollDefault() {
+            document.querySelector(DOMElements.mainElement).removeEventListener("scroll", changeHeaderFunction);
             document.querySelector(DOMElements.mainHeader).style.background.color = "transparent";
             document.querySelector(DOMElements.playTrack).style.cursor = 'default';
-
-            document.querySelector(DOMElements.mainElement).addEventListener('scroll', (event) => {
+            changeHeaderFunction = (event) => {
                 document.querySelector(DOMElements.mainHeader).style.backgroundColor = "#121212";
                 if (document.querySelector(DOMElements.mainElement).scrollTop >= 100) {
                     document.querySelector(DOMElements.playTrack).style.opacity = '0';
@@ -893,8 +896,8 @@ const APPController = (function (APICtrl, UICtrl) {
                     document.querySelector(DOMElements.mainHeader).style.backgroundColor = "transparent";
                     document.querySelector(DOMElements.mainHeaderAlternative).style.backgroundColor = 'transparent';
                 }
-
-            })
+            }
+            document.querySelector(DOMElements.mainElement).addEventListener('scroll', changeHeaderFunction)
         }
 
         nextWindow();
@@ -919,6 +922,8 @@ const APPController = (function (APICtrl, UICtrl) {
     }
 
     async function alternativeWindow() {
+
+        localStorage['hasAlternativeWindow'] = 'true';
 
         const midiaId = this;
 
@@ -1024,13 +1029,16 @@ const APPController = (function (APICtrl, UICtrl) {
             document.querySelector(DOMElements.moveLeft).style.backgroundColor = "#000000B3";
             document.querySelector(DOMElements.moveLeft).style.color = "white";
             document.querySelector(DOMElements.moveLeft).style.cursor = "pointer";
+            document.querySelector(DOMElements.moveRight).style.cursor = 'not-allowed';
+            document.querySelector(DOMElements.moveRight).style.backgroundColor = "rgba(0, 0, 0, 0.35)"
+            document.querySelector(DOMElements.moveRight).style.color = "#b3b3b3";
             document.querySelector(DOMElements.moveLeft).addEventListener('click', defaultWindow);
         }
 
         function changeHeaderOnScrollAlternative() {
+            document.querySelector(DOMElements.mainElement).removeEventListener("scroll", changeHeaderFunction);
             document.querySelector(DOMElements.mainHeader).style.background.color = "transparent";
-            document.querySelector(DOMElements.mainElement).addEventListener('scroll', (event) => {
-
+            changeHeaderFunction = (event) => {
                 if (document.querySelector(DOMElements.mainElement).scrollTop >= 300) {
                     //Change The Header COlor
                     getAverageRGB(DOMElements.playlistImg, function (RGB) {
@@ -1074,7 +1082,8 @@ const APPController = (function (APICtrl, UICtrl) {
 
                 }
 
-            })
+            }
+            document.querySelector(DOMElements.mainElement).addEventListener('scroll', changeHeaderFunction)
         }
 
         function changeBackgroundColor() {
