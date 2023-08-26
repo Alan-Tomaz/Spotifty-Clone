@@ -948,11 +948,25 @@ aside {
     color: black;
     background-color: var(--text-bright-accent);
     border-radius: 50%;
-    margin-right: 32px;
+    margin-right: 24px;
 }
 
 .playlist-btn:hover {
     transform: scale(1.05);
+    cursor: pointer;
+}
+
+.playlist-btn-favorite {
+    display: none;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-bright-accent);
+    margin-right: 16px;
+}
+
+.playlist-btn-favorite svg:hover {
     cursor: pointer;
 }
 
@@ -1033,11 +1047,11 @@ aside {
 }
 
 .track-row:hover .track-favorite {
-    display: flex;
+    visibility: visible !important;
 }
 
 .track-row:hover .track-menu {
-    display: flex;
+    visibility: visible;
 }
 
 .track-row:hover {
@@ -1104,20 +1118,24 @@ aside {
 }
 
 .track-favorite {
-    display: none;
+    display: flex;
+    visibility: hidden;
 }
 
 .track-menu {
+    display: flex;
     color: white;
-    display: none;
+    visibility: hidden;
 }
 
 .track-favorite:hover {
     color: var(--text-color);
+    cursor: pointer;
 }
 
 .track-menu:hover {
-    transform: scale(1.05);
+    color: white;
+    cursor: pointer;
 }
 
 .footer {
