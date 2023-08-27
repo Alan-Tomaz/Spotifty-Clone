@@ -2,7 +2,7 @@
 
 ### A spotify clone created using HTML, CSS and JavaScript (with Fetch API and Module Pattern) together with the **[Spotify API](https://developer.spotify.com/documentation/web-api)**.
 
-![Main Page](https://i.imgur.com/muI9Qau.png)
+![Main Page](https://i.imgur.com/shfMaLg.png)
 
 The site allows the user to log into their **Spotify** account and view their information in an interface that is extremely similar to that of **Spotify**. On the website it is possible:
 - View your episodes;
@@ -14,7 +14,7 @@ The site allows the user to log into their **Spotify** account and view their in
 - Information from your profile, such as avatar and display name;
 
 
-![Music Page](https://i.imgur.com/V6ceES9.png)
+![Music Page](https://i.imgur.com/KOcTOXT.png)
 
 And in addition, it is also possible to view the songs related to albums, playlists and artists.
 
@@ -24,7 +24,7 @@ To access the site you need developer credentials (Client ID and Client Secret) 
 
 Once this is done, you must enter the credentials in the form on the home screen of the site. After that you will be redirected to a **Spotify** authentication screen, where you can log into your account. Once finished, you will be redirected to the main page of the site, where a token will be generated that will be collected by the site to be used in requests to the API endpoints.
 
-![Initial Page](https://i.imgur.com/afWzJwd.png)
+![Initial Page](https://i.imgur.com/zUqKLhT.png)
 
 As soon as you are redirected, the site will load your playlists, your artists, among other things. By clicking on them you will have access to the songs and other related information.
 
