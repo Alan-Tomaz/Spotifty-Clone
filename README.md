@@ -2,7 +2,7 @@
 
 ### A spotify clone created using HTML, CSS and JavaScript (with Fetch API and Module Pattern) together with the **[Spotify API](https://developer.spotify.com/documentation/web-api)**.
 
-![Main Page](https://i.imgur.com/wNyx5DK.png)
+![Main Page](https://i.imgur.com/muI9Qau.png)
 
 The site allows the user to log into their **Spotify** account and view their information in an interface that is extremely similar to that of **Spotify**. On the website it is possible:
 - View your episodes;

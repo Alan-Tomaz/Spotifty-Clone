@@ -1067,7 +1067,10 @@ const APPController = (function (APICtrl, UICtrl) {
         episodeInfoDiv: '.episode-info-div',
         episodeShowName: '.episode-show-name',
         episodeDate: '.episode-date',
-        playlistBtnSaved: '.playlist-btn-saved'
+        playlistBtnSaved: '.playlist-btn-saved',
+        //Player info
+        playerActualSec: '.player-actual-sec',
+        playerTotalSec: '.player-total-sec'
     }
 
     let changeHeaderFunction;
@@ -1666,7 +1669,7 @@ const APPController = (function (APICtrl, UICtrl) {
                 async function changeTopInfo() {
                     document.querySelector(DOMElements.playlistImg).src = track.album.images[0].url;
                     document.querySelector(DOMElements.playlistType).innerHTML = "Song";
-                    document.querySelector(DOMElements.playlistName).innerHTML = track.name.length > 20 ? `${(track.name).slice(0, 20)}...` : track.name;
+                    document.querySelector(DOMElements.playlistName).innerHTML = track.name.length > 20 ? `${(track.name).slice(0, 15)}...` : track.name;
                     document.querySelector(DOMElements.playlistUserImg).src = artistInfo.images[0].url;
                     document.querySelector(DOMElements.playlistUserName).innerHTML = artistInfo.name;
 
@@ -2090,6 +2093,43 @@ const APPController = (function (APICtrl, UICtrl) {
                         return (x / y) * 100;
                     }
 
+                    function setDurationTime(duration_ms) {
+                        let durationTrack = duration_ms;
+                        let durationMin;
+                        let durationSec;
+                        if (((durationTrack / 1000) / 60) >= 1) {
+                            durationMin = Math.floor((durationTrack / 1000) / 60).toFixed(0)
+                            durationTrack -= (durationMin * 1000) * 60;
+                        }
+                        if ((durationTrack / 1000) >= 1) {
+                            durationSec = Math.floor(durationTrack / 1000).toFixed(0)
+                            durationTrack -= (durationSec * 1000) * 60;
+                        }
+                        if (durationMin != undefined || durationSec != undefined) {
+                            if (durationMin != undefined) {
+                                if (durationSec != undefined) {
+                                    if (durationSec > 9) {
+                                        return `${durationMin}:${durationSec}`
+                                    } else {
+                                        return `${durationMin}:0${durationSec}`
+                                    }
+                                } else {
+                                    return `${durationMin}:00`
+                                }
+                            } else {
+                                if (durationSec > 9) {
+                                    return `0:${durationSec}`
+                                } else {
+                                    return `0:0${durationSec}`
+                                }
+                            }
+                        } else {
+                            return `0:00`
+                        }
+                    }
+
+                    document.querySelector(DOMElements.playerActualSec).innerHTML = setDurationTime(trackPlaying.progress_ms)
+                    document.querySelector(DOMElements.playerTotalSec).innerHTML = setDurationTime(trackPlaying.item.duration_ms)
                     document.querySelector(DOMElements.actualTimeBar).style.width = `${setProgressBar(trackPlaying.progress_ms, trackPlaying.item.duration_ms)}%`;
 
                 }
@@ -2116,6 +2156,7 @@ const APPController = (function (APICtrl, UICtrl) {
         init() {
             console.log("App Is Running")
             UICtrl.startDropdowns();
+            document.querySelector(".home-btn").addEventListener('click', defaultWindow)
             defaultWindow();
             //get and store token and initiate the API interaction
             storeToken();
