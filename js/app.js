@@ -45,7 +45,6 @@ const APIController = (function () {
             });
 
             const data = await result.json();
-            console.log(data);
             if (data.error != undefined) {
                 window.location.href = localStorage['root-url']
             } else {
@@ -63,7 +62,6 @@ const APIController = (function () {
             params.append('client_id', clientId);
             params.append('client_secret', clientSecret);
 
-            console.log(params.toString())
 
             const result = await fetch('https://accounts.spotify.com/api/token', {
                 method: 'POST',
@@ -75,7 +73,6 @@ const APIController = (function () {
             });
 
             const data = await result.json();
-            console.log(data);
             localStorage['refresh-token'] = data.refresh_token;
             return data.access_token;
         }
@@ -324,7 +321,7 @@ const APIController = (function () {
 
     const _getCurrentArtistTopTracks = async (token, artistId) => {
 
-        const result = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks`, {
+        const result = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -410,7 +407,11 @@ const UIController = (function () {
         favoritAlbums: '.favorit-albums',
         favoritPlaylists: '.favorit-playlists',
         //bottom alternative window elements
-        tracksBody: '.tracks-body'
+        tracksBody: '.tracks-body',
+        episodesBody: '.episodes-body',
+        artistsTracks: '#artists-tracks',
+        trackInfoDiv: '.track-info-div',
+        episodeInfoDiv: '.episode-info-div'
     }
 
     function _formatTime(time) {
@@ -418,28 +419,40 @@ const UIController = (function () {
         switch (time[1]) {
             case '01':
                 month = 'Jan';
+                break;
             case '02':
                 month = 'Feb';
+                break;
             case '03':
                 month = 'Mar';
+                break;
             case '04':
                 month = 'Apr';
+                break;
             case '05':
                 month = 'May';
+                break;
             case '06':
                 month = 'Jun';
+                break;
             case '07':
                 month = 'Jul';
+                break;
             case '08':
                 month = 'Aug';
+                break;
             case '09':
                 month = 'Sep';
+                break;
             case '10':
                 month = 'Oct';
+                break;
             case '11':
                 month = 'Nov';
+                break;
             case '12':
                 month = 'Dec';
+                break;
         }
         return month + " " + time[0];
     }
@@ -450,28 +463,40 @@ const UIController = (function () {
         switch (newTime[1]) {
             case '01':
                 month = 'Jan';
+                break;
             case '02':
                 month = 'Feb';
+                break;
             case '03':
                 month = 'Mar';
+                break;
             case '04':
                 month = 'Apr';
+                break;
             case '05':
                 month = 'May';
+                break;
             case '06':
                 month = 'Jun';
+                break;
             case '07':
                 month = 'Jul';
+                break;
             case '08':
                 month = 'Aug';
+                break;
             case '09':
                 month = 'Sep';
+                break;
             case '10':
                 month = 'Oct';
+                break;
             case '11':
                 month = 'Nov';
+                break;
             case '12':
                 month = 'Dec';
+                break;
         }
         return `${month} ${newTime[2].slice(0, 2)}, ${newTime[0]} `;
     }
@@ -505,6 +530,7 @@ const UIController = (function () {
 
         /* Iniciate The Dropdown Menus */
         startDropdowns() {
+
             /* DROPDOWN */
             const dropdowns = document.querySelectorAll('.dropdown');
 
@@ -756,11 +782,11 @@ const UIController = (function () {
                                 <div class="track-name track-item">
                                     <img src="${trackImg}" alt="">
                                     <div class="track-info">
-                                        <p class="track-name-info">${_formatName(trackName, 30)}</p>
-                                        <p class="track-author" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
+                                        <p class="track-name-info track-link" id="${trackId}">${_formatName(trackName, 30)}</p>
+                                        <p class="track-author artist-link" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
                                     </div>
                                 </div>
-                                <div class="track-album track-item" id="${trackAlbumId}">${_formatName(trackAlbumName, 50)}</div>
+                                <div class="track-album track-item album-link" id="${trackAlbumId}">${_formatName(trackAlbumName, 50)}</div>
                                 <div class="track-added track-item">${_formatAddedTime(trackAddedDate)}</div>
                                 <div class="track-time track-item">
                                     <div class="track-favorite">
@@ -793,8 +819,8 @@ const UIController = (function () {
                                 </div>
                                 <div class="track-name track-item">
                                     <div class="track-info">
-                                        <p class="track-name-info">${_formatName(trackName, 30)}</p>
-                                        <p class="track-author" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
+                                        <p class="track-name-info track-link" id="${trackId}">${_formatName(trackName, 30)}</p>
+                                        <p class="track-author artist-link" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
                                     </div>
                                 </div>
                                 <div class="track-time track-item">
@@ -832,11 +858,11 @@ const UIController = (function () {
                                 <div class="track-name track-item">
                                     <img src="${trackImg}" alt="">
                                     <div class="track-info">
-                                        <p class="track-name-info">${_formatName(trackName, 30)}</p>
-                                        <p class="track-author" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
+                                        <p class="track-name-info track-link" id="${trackId}">${_formatName(trackName, 30)}</p>
+                                        <p class="track-author artist-link" id="${trackArtistId}">${_formatName(trackArtistName, 30)}</p>
                                     </div>
                                 </div>
-                                <div class="track-album track-item" id="${trackAlbumId}">${_formatName(trackAlbumName, 50)}</div>
+                                <div class="track-album track-item album-link" id="${trackAlbumId}">${_formatName(trackAlbumName, 50)}</div>
                                 <div class="track-added track-item">${_formatAddedTime(trackAddedDate)}</div>
                                 <div class="track-time track-item">
                                     <div class="track-favorite">
@@ -857,6 +883,109 @@ const UIController = (function () {
             document.querySelector(DOMElements.tracksBody).insertAdjacentHTML('beforeend', html);
         },
 
+        createSavedEpisode(episodeId, episodeName, episodeImg, episodeShowName, episodeShowId, episodeDescription, episodeAddedDate, episodeDuration) {
+            const html = `
+                        <hr class="episode-border">
+                        <div class="episode-row" id="${episodeId}">
+                            <div class="episode-img">
+                                <img src="${episodeImg}">
+                            </div>
+                            <div class="episode-header">
+                                <a class="episode-title episode-link" id="${episodeId}">${_formatName(episodeName, 40)}</a>
+                                <a class="episode-show-name" id="${episodeShowId}">${_formatName(episodeShowName, 40)}</a>
+                            </div>
+                            <div class="episode-description">
+                                <p>${_formatName(episodeDescription, 200)}</p>
+                            </div>
+                            <div class="episode-play-btn">
+                                <span>
+                                <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"></path></svg>
+                                </span>
+                            </div>
+                            <div class="episode-info">
+                                <span class="episode-info-1">${_formatAddedTime(episodeAddedDate)}</span>
+                                <span class="episode-info-2">•</span>
+                                <span class="episode-info-3">${episodeDuration}</span2>
+                            </div>
+                            <div class="episode-btns">
+                                <div class="episode-share">
+                                    <svg role="img" height="24" width="24" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq"><path d="M3 8a1 1 0 0 1 1-1h3.5v2H5v11h14V9h-2.5V7H20a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z"></path><path d="M12 12.326a1 1 0 0 0 1-1V3.841l1.793 1.793a1 1 0 1 0 1.414-1.414L12 .012 7.793 4.22a1 1 0 1 0 1.414 1.414L11 3.84v7.485a1 1 0 0 0 1 1z"></path></svg>
+                                </div>
+                                <div class="episode-saved">
+                                    <svg role="img" height="24" width="24" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq"><path d="M1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12zm16.398-2.38a1 1 0 0 0-1.414-1.413l-6.011 6.01-1.894-1.893a1 1 0 0 0-1.414 1.414l3.308 3.308 7.425-7.425z"></path></svg>
+                                </div>
+                                <div class="episode-menu">
+                                    <svg role="img" height="24" width="24" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq"><path d="M4.5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm15 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-7.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        `;
+            document.querySelector(DOMElements.episodesBody).insertAdjacentHTML('beforeend', html);
+        },
+
+        createTopTrack(index, trackId, trackName, trackImg, trackDuration) {
+            const html = `
+                        <div class="artist-track-row">
+                                <div class="track-num track-item">
+                                    <span class="track-number">${index + 1}</span>
+                                    <svg role="img" height="16" width="16" aria-hidden="true" class="track-play" viewBox="0 0 24 24" data-encore-id="icon">
+                                        <path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="track-name track-item">
+                                    <img src="${trackImg}" alt="">
+                                    <div class="track-info">
+                                        <p class="track-name-info track-link" id="${trackId}">${_formatName(trackName, 30)}</p>
+                                    </div>
+                                </div>
+                                <div class="track-time track-item">
+                                    <div class="track-favorite">
+                                       <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq"><path d="M1.69 2A4.582 4.582 0 0 1 8 2.023 4.583 4.583 0 0 1 11.88.817h.002a4.618 4.618 0 0 1 3.782 3.65v.003a4.543 4.543 0 0 1-1.011 3.84L9.35 14.629a1.765 1.765 0 0 1-2.093.464 1.762 1.762 0 0 1-.605-.463L1.348 8.309A4.582 4.582 0 0 1 1.689 2zm3.158.252A3.082 3.082 0 0 0 2.49 7.337l.005.005L7.8 13.664a.264.264 0 0 0 .311.069.262.262 0 0 0 .09-.069l5.312-6.33a3.043 3.043 0 0 0 .68-2.573 3.118 3.118 0 0 0-2.551-2.463 3.079 3.079 0 0 0-2.612.816l-.007.007a1.501 1.501 0 0 1-2.045 0l-.009-.008a3.082 3.082 0 0 0-2.121-.861z"></path></svg>
+                                    </div>
+                                    <div class="track-timing">
+                                       ${_trackDuration(trackDuration)}
+                                    </div>
+                                    <div class="track-menu track-item">
+                                        <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" class="Svg-sc-ytk21e-0 haNxPq">
+                                            <path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                        `;
+            document.querySelector(DOMElements.artistsTracks).insertAdjacentHTML('beforeend', html);
+        },
+
+        createArtistCardAlt(artistId, artistName, artistImg) {
+            const html = `
+        <div class="artist-card-alt artist-link" id="${artistId}">
+            <div class="artist-card-img">
+                <img src="${artistImg}">
+            </div>
+            <div class="artist-card-info">
+                <h3>Artist</h3>
+                <h3 class="artist-card-name artist-link" id="${artistId}">${artistName}</h3>
+            </div>
+        </div>
+            `
+            document.querySelector(DOMElements.trackInfoDiv).insertAdjacentHTML('beforeend', html);
+        },
+
+        createEpisodeInfo(episodeDescription) {
+            const html = `
+            <div class="episode-description-box">
+            <h3 class="episode-description-title">Episode Description</h3>
+            <div class="episode-description-text">
+            <p>${episodeDescription}</p>
+            </div>
+        </div>
+            `
+            document.querySelector(DOMElements.episodeInfoDiv).insertAdjacentHTML('beforeend', html);
+        }
     }
 })()
 
@@ -891,7 +1020,7 @@ const APPController = (function (APICtrl, UICtrl) {
         userImg: '#profile-img',
         forMe: '#for-me',
         playlistUserImg: '#playlist-user-img',
-        playlistUserName: '#playlist-user-name',
+        playlistUserName: '.playlist-user-name',
         //lateral bar items
         playlistItems: '.playlist-item',
         artistItems: '.artist-item',
@@ -927,7 +1056,18 @@ const APPController = (function (APICtrl, UICtrl) {
         tracksHeader: '.tracks-header',
         albumFavorite: '#album-favorite',
         playlistMenu: '.playlist-menu',
-        trackFavorite: '.track-favorite'
+        trackFavorite: '.track-favorite',
+        episodesBody: '.episodes-body',
+        playlistInfo: '.playlist-user',
+        artistsBody: '.artists-body',
+        artistsTracks: '#artists-tracks',
+        trackInfoDiv: '.track-info-div',
+        playlistFavoritAlt: '.playlist-btn-favorite-alt',
+        playlistBtnSaved: '.playlist-btn-saved',
+        episodeInfoDiv: '.episode-info-div',
+        episodeShowName: '.episode-show-name',
+        episodeDate: '.episode-date',
+        playlistBtnSaved: '.playlist-btn-saved'
     }
 
     let changeHeaderFunction;
@@ -1008,6 +1148,50 @@ const APPController = (function (APICtrl, UICtrl) {
 
         async function changeWindow() {
 
+            function formatEpisodeTime(time) {
+                const newTime = time.split('-');
+                let month;
+                switch (newTime[1]) {
+                    case '01':
+                        month = 'Jan';
+                        break;
+                    case '02':
+                        month = 'Feb';
+                        break;
+                    case '03':
+                        month = 'Mar';
+                        break;
+                    case '04':
+                        month = 'Apr';
+                        break;
+                    case '05':
+                        month = 'May';
+                        break;
+                    case '06':
+                        month = 'Jun';
+                        break;
+                    case '07':
+                        month = 'Jul';
+                        break;
+                    case '08':
+                        month = 'Aug';
+                        break;
+                    case '09':
+                        month = 'Sep';
+                        break;
+                    case '10':
+                        month = 'Oct';
+                        break;
+                    case '11':
+                        month = 'Nov';
+                        break;
+                    case '12':
+                        month = 'Dec';
+                        break;
+                }
+                return `${month} ${newTime[0]} `;
+            }
+
             function getMidiaPlaylistDuration(tracks) {
                 let tracksDuration = 0;
                 let durationHours = 0;
@@ -1064,6 +1248,53 @@ const APPController = (function (APICtrl, UICtrl) {
 
             }
 
+            function getMidiaEpisodeDuration(episodeDuration) {
+                let durationHours = 0;
+                let durationMinutes = 0;
+                let durationSeconds = 0;
+
+                let tracksDuration = episodeDuration;
+                if ((((tracksDuration / 1000) / 60) / 60) >= 1) {
+                    durationHours = ((((tracksDuration / 1000) / 60) / 60)).toFixed(0);
+                    return `about ${durationHours} hr`;
+                }
+                if (((tracksDuration / 1000) / 60) >= 1) {
+                    durationMinutes = (((tracksDuration / 1000) / 60)).toFixed(0);
+                    tracksDuration -= ((durationMinutes * 1000) * 60);
+                }
+                if ((tracksDuration / 1000) >= 1) {
+                    durationSeconds = (tracksDuration / 1000).toFixed(0);
+                }
+
+                if (durationSeconds != 0) {
+                    return `${durationMinutes} min ${durationSeconds} sec`
+                }
+
+                return `${durationMinutes} min`
+
+            }
+
+            function getYear(time) {
+                return time[0];
+            }
+
+            function trackDuration(durationMs) {
+                let durationTrack = durationMs;
+                const trackDurationMin = Math.floor((durationMs / 1000) / 60).toFixed(0);
+                durationTrack = durationTrack - ((trackDurationMin * 1000) * 60);
+                if ((durationTrack / 1000) >= 1) {
+                    const trackDurationSec = Math.floor(durationTrack / 1000).toFixed(0);
+
+                    if (trackDurationSec > 9) {
+                        return `${trackDurationMin} : ${trackDurationSec}`
+                    } else {
+                        return `${trackDurationMin} : 0${trackDurationSec}`
+                    }
+                } else {
+                    return `${trackDurationMin} : 00`
+                }
+            }
+
             function changeWindowToPlaylist(playlistInfo, playlistTracks) {
 
                 async function changeTopInfo() {
@@ -1075,19 +1306,38 @@ const APPController = (function (APICtrl, UICtrl) {
                     const token = localStorage['token'];
                     //get user Info
                     const userInfo = await APICtrl.getUser(token, playlistInfo.owner.id);
-                    console.log(playlistTracks);
 
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'none';
+                    document.querySelector(DOMElements.playlistDetail5).style.color = `var(--text-color)`;
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'none';
 
+                    document.querySelector(DOMElements.artistsBody).style.display = 'none';
                     document.querySelector(DOMElements.playlistUserImg).src = userInfo.images[0].url;
                     document.querySelector(DOMElements.playlistUserName).innerHTML = userInfo.display_name;
 
+
+
                     document.querySelector(DOMElements.playlistDetail4).innerHTML = `${playlistInfo.tracks.total} songs,`;
+
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'flex';
 
                     document.querySelector(DOMElements.playlistDetail5).style.display = "initial";
                     document.querySelector(DOMElements.playlistDetail5).innerHTML = getMidiaPlaylistDuration(playlistTracks);
 
                     //change the playlist menu
                     document.querySelector(DOMElements.playlistMenu).style.display = 'flex';
+
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'none';
+                    document.querySelector(DOMElements.episodeDate).style.display = `none`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "none"
+
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'grid';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'grid';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'none';
 
                     //change tracks header
                     document.querySelector(DOMElements.trackHeader).style.gridTemplateColumns = "20px 6fr 4fr 4fr 2fr";
@@ -1125,6 +1375,9 @@ const APPController = (function (APICtrl, UICtrl) {
                         element.style.color = 'var(--grey-color)';
 
                     });
+                    document.querySelectorAll('.artist-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                    document.querySelectorAll('.album-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                    document.querySelectorAll('.track-link').forEach(element => element.addEventListener('click', alternativeWindow));
                 }
 
                 changeTopInfo();
@@ -1135,8 +1388,7 @@ const APPController = (function (APICtrl, UICtrl) {
             function changeWindowToAlbum(albumInfo, albumTracks) {
 
                 async function changeTopInfo() {
-                    console.log(albumInfo);
-                    console.log(albumTracks);
+
                     document.querySelector(DOMElements.playlistImg).src = albumInfo.images[0].url;
                     document.querySelector(DOMElements.playlistType).innerHTML = "Album";
                     document.querySelector(DOMElements.playlistName).innerHTML = albumInfo.name;
@@ -1146,8 +1398,11 @@ const APPController = (function (APICtrl, UICtrl) {
                     //get user Info
                     const artistInfo = await APICtrl.getCurrentArtistInfo(token, albumInfo.artists[0].id);
 
-                    console.log(artistInfo)
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'none';
+                    document.querySelector(DOMElements.playlistDetail5).style.color = `var(--text-color)`;
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'none';
 
+                    document.querySelector(DOMElements.artistsBody).style.display = 'none';
                     document.querySelector(DOMElements.playlistUserImg).src = artistInfo.images[0].url;
                     document.querySelector(DOMElements.playlistUserName).innerHTML = artistInfo.name;
 
@@ -1156,12 +1411,25 @@ const APPController = (function (APICtrl, UICtrl) {
                     document.querySelector(DOMElements.playlistDetail5).style.display = "initial";
                     document.querySelector(DOMElements.playlistDetail5).innerHTML = getMidiaAlbumDuration(albumTracks);
 
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'flex';
+
                     //change the playlist menu
                     document.querySelector(DOMElements.playlistMenu).style.display = 'flex';
 
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'grid';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'grid';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'none';
+                    document.querySelector(DOMElements.episodeDate).style.display = `none`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "none"
+
                     //change tracks header
                     document.querySelector(DOMElements.trackHeader).style.gridTemplateColumns = "20px 14fr 2fr";
-                    console.log(document.querySelectorAll(DOMElements.trackBodyRow));
                     document.querySelectorAll(DOMElements.trackBodyRow).forEach(element => {
                         element.style.gridTemplateColumns = "20px 14fr 2fr";
                     });
@@ -1195,6 +1463,9 @@ const APPController = (function (APICtrl, UICtrl) {
                         element.style.color = 'var(--grey-color)';
 
                     });
+
+                    document.querySelectorAll('.artist-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                    document.querySelectorAll('.track-link').forEach(element => element.addEventListener('click', alternativeWindow));
                 }
 
                 changeTopInfo();
@@ -1208,18 +1479,34 @@ const APPController = (function (APICtrl, UICtrl) {
                     document.querySelector(DOMElements.playlistType).innerHTML = "Playlist";
                     document.querySelector(DOMElements.playlistName).innerHTML = "Liked Songs";
 
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'none';
+                    document.querySelector(DOMElements.playlistDetail5).style.color = `var(--text-color)`;
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'none';
 
                     document.querySelector(DOMElements.playlistUserImg).src = userInfo.images[0].url;
                     document.querySelector(DOMElements.playlistUserName).innerHTML = userInfo.display_name;
 
                     document.querySelector(DOMElements.playlistDetail4).innerHTML = `${playlistTracks.total} songs`;
 
+                    document.querySelector(DOMElements.artistsBody).style.display = 'none';
                     document.querySelector(DOMElements.playlistDetail5).style.display = "none";
+
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'flex';
 
                     //change the playlist menu
                     document.querySelector(DOMElements.playlistMenu).style.display = 'none';
 
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'grid';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'grid';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'none';
 
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'none';
+                    document.querySelector(DOMElements.episodeDate).style.display = `none`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "none"
 
                     //change tracks header
                     document.querySelector(DOMElements.trackHeader).style.gridTemplateColumns = "20px 6fr 4fr 4fr 2fr";
@@ -1256,6 +1543,217 @@ const APPController = (function (APICtrl, UICtrl) {
                         element.style.color = 'var(--text-bright-accent)';
 
                     });
+                    document.querySelectorAll('.artist-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                    document.querySelectorAll('.album-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                    document.querySelectorAll('.track-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                }
+
+                changeTopInfo();
+                changeBottomInfo();
+
+            }
+
+            function changeWindowToSavedEpisodes(userInfo, episodes) {
+
+                async function changeTopInfo() {
+                    document.querySelector(DOMElements.playlistImg).src = "../img/your-episodes.png";
+                    document.querySelector(DOMElements.playlistType).innerHTML = "Playlist";
+                    document.querySelector(DOMElements.playlistName).innerHTML = "Your Episodes";
+
+
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'none';
+                    document.querySelector(DOMElements.playlistDetail5).style.color = `var(--text-color)`;
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistUserImg).src = userInfo.images[0].url;
+                    document.querySelector(DOMElements.playlistUserName).innerHTML = userInfo.display_name;
+
+                    document.querySelector(DOMElements.playlistDetail4).innerHTML = `${episodes.total} songs`;
+
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'flex';
+                    document.querySelector(DOMElements.artistsBody).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistDetail5).style.display = "none";
+
+                    //change the playlist menu
+                    document.querySelector(DOMElements.playlistMenu).style.display = 'none';
+                    document.querySelector(DOMElements.albumFavorite).style.display = 'none';
+
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'none';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'none';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'flex';
+
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '5px';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '5px';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'none';
+                    document.querySelector(DOMElements.episodeDate).style.display = `none`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "none"
+                }
+
+                function changeBottomInfo() {
+                    document.querySelector(DOMElements.episodesBody).innerHTML = '';
+                    episodes.items.forEach(element => {
+                        UICtrl.createSavedEpisode(element.episode.id, element.episode.name, element.episode.images[0].url, element.episode.show.name, element.episode.show.id, element.episode.description, element.added_at, getMidiaEpisodeDuration(element.episode.duration_ms));
+                    });
+                    document.querySelectorAll('.episode-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                }
+
+                changeTopInfo();
+                changeBottomInfo();
+
+
+            }
+
+            function changeWindowToArtist(artistInfo, artistTracks) {
+
+                async function changeTopInfo() {
+                    document.querySelector(DOMElements.playlistImg).src = artistInfo.images[0].url;
+                    document.querySelector(DOMElements.playlistType).innerHTML = "Artist";
+                    document.querySelector(DOMElements.playlistName).innerHTML = artistInfo.name;
+
+
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'none';
+                    document.querySelector(DOMElements.playlistDetail5).style.color = `var(--text-color)`;
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'none';
+
+                    //change the playlist menu
+                    document.querySelector(DOMElements.playlistMenu).style.display = 'flex';
+
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'none';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'none';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'none';
+                    document.querySelector(DOMElements.artistsBody).style.display = 'flex';
+
+                    document.querySelector(DOMElements.albumFavorite).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '50%';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '50%';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'none';
+                    document.querySelector(DOMElements.episodeDate).style.display = `none`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "none"
+                }
+
+                function changeBottomInfo() {
+                    document.querySelector(DOMElements.artistsTracks).innerHTML = '';
+                    artistTracks.tracks.forEach((element, index) => {
+                        UICtrl.createTopTrack(index, element.id, element.name, element.album.images[0].url, element.duration_ms);
+                    });
+
+                    document.querySelectorAll(DOMElements.trackFavorite).forEach(element => {
+                        element.style.visibility = 'hidden';
+                        element.style.color = 'var(--grey-color)';
+
+                    });
+                    document.querySelectorAll('.track-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                }
+
+
+                changeTopInfo();
+                changeBottomInfo();
+
+            }
+
+            function changeWindowToTrack(track, artistInfo) {
+
+                const token = localStorage['token'];
+
+                async function changeTopInfo() {
+                    document.querySelector(DOMElements.playlistImg).src = track.album.images[0].url;
+                    document.querySelector(DOMElements.playlistType).innerHTML = "Song";
+                    document.querySelector(DOMElements.playlistName).innerHTML = track.name.length > 20 ? `${(track.name).slice(0, 20)}...` : track.name;
+                    document.querySelector(DOMElements.playlistUserImg).src = artistInfo.images[0].url;
+                    document.querySelector(DOMElements.playlistUserName).innerHTML = artistInfo.name;
+
+                    document.querySelector(DOMElements.playlistDetail4).innerHTML = `${track.album.name} `;
+                    document.querySelector(DOMElements.playlistDetail5).innerHTML = `${getYear((track.album.release_date).split('-'))} • ${trackDuration(track.duration_ms)}`;
+
+                    document.querySelector(DOMElements.playlistDetail5).style.color = `var(--text-color)`;
+
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'flex';
+
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'flex';
+
+                    //change the playlist menu
+                    document.querySelector(DOMElements.playlistMenu).style.display = 'flex';
+
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'none';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'none';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'none';
+                    document.querySelector(DOMElements.artistsBody).style.display = 'none';
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'grid';
+                    document.querySelector(DOMElements.albumFavorite).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '0px';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'none';
+                    document.querySelector(DOMElements.episodeDate).style.display = `none`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "none"
+                }
+
+                function changeBottomInfo() {
+                    document.querySelector(DOMElements.trackInfoDiv).innerHTML = '';
+                    track.artists.forEach(async element => {
+                        const artistInfo = await APICtrl.getCurrentArtistInfo(token, element.id);
+                        UICtrl.createArtistCardAlt(artistInfo.id, artistInfo.name, artistInfo.images[0].url);
+                        document.querySelectorAll('.artist-link').forEach(element => element.addEventListener('click', alternativeWindow));
+                    });
+
+                }
+
+                changeTopInfo();
+                changeBottomInfo();
+
+            }
+
+            function changeWindowToEpisode(episode) {
+
+                function changeTopInfo() {
+                    document.querySelector(DOMElements.playlistImg).src = episode.images[0].url;
+                    document.querySelector(DOMElements.playlistType).innerHTML = "Podcast Episode";
+                    document.querySelector(DOMElements.playlistName).innerHTML = episode.name.length > 20 ? `${(episode.name).slice(0, 20)}...` : episode.name;
+
+
+                    document.querySelector(DOMElements.playlistInfo).style.display = 'none';
+
+                    document.querySelector(DOMElements.playlistFavoritAlt).style.display = 'none';
+
+                    //change the playlist menu
+                    document.querySelector(DOMElements.playlistMenu).style.display = 'flex';
+
+                    //display tracks header and body to none
+                    document.querySelector(DOMElements.trackHeader).style.display = 'none';
+                    document.querySelector(DOMElements.tracksBody).style.display = 'none';
+                    document.querySelector(DOMElements.episodesBody).style.display = 'none';
+                    document.querySelector(DOMElements.artistsBody).style.display = 'none';
+                    document.querySelector(DOMElements.trackInfoDiv).style.display = 'none';
+                    document.querySelector(DOMElements.albumFavorite).style.display = 'none';
+
+
+                    document.querySelector(DOMElements.playlistCover).style.borderRadius = '15px';
+                    document.querySelector(DOMElements.playlistImg).style.borderRadius = '15px';
+                    document.querySelector(DOMElements.episodeInfoDiv).style.display = 'flex';
+                    document.querySelector(DOMElements.episodeShowName).innerHTML = episode.show.name;
+                    document.querySelector(DOMElements.episodeShowName).style.display = 'flex';
+                    document.querySelector(DOMElements.episodeDate).style.display = `flex`;
+                    document.querySelector(DOMElements.episodeDate).innerHTML = `${formatEpisodeTime(episode.release_date)} • ${getMidiaEpisodeDuration(episode.duration_ms)}`;
+                    document.querySelector(DOMElements.playlistBtnSaved).style.display = "flex"
+                }
+
+                function changeBottomInfo() {
+                    document.querySelector(DOMElements.episodeInfoDiv).innerHTML = '';
+
+                    UICtrl.createEpisodeInfo(episode.description);
+
+
+
                 }
 
                 changeTopInfo();
@@ -1276,7 +1774,7 @@ const APPController = (function (APICtrl, UICtrl) {
                     //get playlist tracks
                     const playlistTracks = await APICtrl.getCurrentPlaylistTracks(token, midiaId.id, 20);
                     changeWindowToPlaylist(playlistInfo, playlistTracks);
-                } else if (midiaId.classList.contains('album-item') == true || midiaId.classList.contains('album-card') == true) {
+                } else if (midiaId.classList.contains('album-item') == true || midiaId.classList.contains('album-card') == true || midiaId.classList.contains('album-link') == true) {
                     //get token
                     const token = localStorage['token'];
                     //get playlist info
@@ -1286,8 +1784,46 @@ const APPController = (function (APICtrl, UICtrl) {
                     changeWindowToAlbum(albumInfo, albumTracks);
 
 
-                } else if (midiaId.id == "episodes") {
+                } else if (midiaId.classList.contains('artist-item') == true || midiaId.classList.contains('artist-card') == true || midiaId.classList.contains('artist-link') == true) {
+                    //get token
+                    const token = localStorage['token'];
+                    //get artist info
+                    const albumInfo = await APICtrl.getCurrentArtistInfo(token, midiaId.id);
+                    //get artist top tracks
+                    const artistTopTracks = await APICtrl.getCurrentArtistTopTracks(token, midiaId.id, 20);
+                    changeWindowToArtist(albumInfo, artistTopTracks);
 
+
+                } else if (midiaId.classList.contains('track-card') == true || midiaId.classList.contains('track-link') == true) {
+                    //get token
+                    const token = localStorage['token'];
+                    //get track info
+                    const trackInfo = await APICtrl.getTrack(token, midiaId.id);
+                    //get artist info
+                    const artistInfo = await APICtrl.getCurrentArtistInfo(token, trackInfo.artists[0].id);
+                    changeWindowToTrack(trackInfo, artistInfo);
+
+
+                } else if (midiaId.classList.contains('episode-card') == true || midiaId.classList.contains('episode-link') == true) {
+                    //get token
+                    const token = localStorage['token'];
+                    //get track info
+                    const trackInfo = await APICtrl.getEpisode(token, midiaId.id);
+
+                    changeWindowToEpisode(trackInfo);
+
+
+                } else if (midiaId.id == "episodes") {
+                    document.querySelector(DOMElements.app).style.opacity = '0';
+                    document.querySelector(DOMElements.app).style.transition = '.3s';
+
+                    //get token
+                    const token = localStorage['token'];
+                    //get current user info
+                    const userInfo = await APICtrl.getUserProfile(token);
+                    //get playlist tracks
+                    const episodes = await APICtrl.getCurrentSavedEpisodes(token, 20);
+                    changeWindowToSavedEpisodes(userInfo, episodes);
                 } else if (midiaId.id == "favorits") {
                     document.querySelector(DOMElements.app).style.opacity = '0';
                     document.querySelector(DOMElements.app).style.transition = '.3s';
